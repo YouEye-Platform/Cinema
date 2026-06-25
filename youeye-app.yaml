@@ -1,0 +1,244 @@
+apiVersion: v1
+kind: app
+integration: native
+version: 0.5.0
+surfaceSchemaVersion: 1
+metadata:
+  id: "cinema"
+  name: "Cinema"
+  description: "Discover movies and TV shows powered by TMDB. Track what you've watched, build watchlists, and write reviews."
+  icon: "film"
+  category: "media"
+  website: "https://github.com/YouEye-Platform/Cinema"
+  tags: ["movies", "tv", "watchlist", "tmdb", "native"]
+  defaultSubdomain: "cinema"
+
+detail:
+  longDescription: |
+    Cinema is your personal movie and TV tracking app, powered by TMDB. Discover new titles,
+    track what you've watched, build watchlists, write reviews, and keep the experience on your own server.
+  screenshots:
+    - path: "assets/screenshots/1.png"
+      caption: "Movie discovery and trending titles"
+    - path: "assets/screenshots/2.png"
+      caption: "Your watchlist and ratings"
+
+capabilities:
+  widgets: true
+  settings_panel: true
+
+surfaces:
+  - id: app-settings
+    kind: settings-panel
+    placement: app-settings
+    name: App Settings
+    description: App-owned settings panel
+    embedPath: /embed/settings
+    permissions: []
+  - id: now-watching
+    kind: widget
+    placement: dashboard
+    name: Now Watching
+    description: Currently watching and recently watched movies and shows
+    embedPath: /embed/widget/now-watching
+    permissions: []
+    defaultSize:
+      width: 28
+      height: 25
+    minSize:
+      width: 20
+      height: 18
+    maxSize:
+      width: 50
+      height: 45
+    refreshInterval: 300
+  - id: trending
+    kind: widget
+    placement: dashboard
+    name: Trending Movies
+    description: Today's trending movies from TMDB
+    embedPath: /embed/widget/trending
+    permissions: []
+    defaultSize:
+      width: 35
+      height: 28
+    minSize:
+      width: 25
+      height: 20
+    maxSize:
+      width: 55
+      height: 50
+    refreshInterval: 3600
+  - id: movie-info
+    kind: info-card
+    placement: timeline
+    name: Movie info
+    description: Movie and TV show details with ratings
+    embedPath: /embed/card/movie
+    permissions: []
+    triggers:
+      - imdb.com
+      - themoviedb.org
+  - id: cinema-movie-viewed
+    kind: timeline-card
+    placement: timeline
+    name: Movie viewed
+    description: Movie detail page viewed
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-movie-viewed
+  - id: cinema-tv-viewed
+    kind: timeline-card
+    placement: timeline
+    name: TV show viewed
+    description: TV show detail page viewed
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-tv-viewed
+  - id: cinema-movie-watched
+    kind: timeline-card
+    placement: timeline
+    name: Movie watched
+    description: Movie marked as watched with optional rating
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-movie-watched
+  - id: cinema-tv-watched
+    kind: timeline-card
+    placement: timeline
+    name: TV show watched
+    description: TV show marked as watched with optional rating
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-tv-watched
+  - id: cinema-watchlist-add
+    kind: timeline-card
+    placement: timeline
+    name: Added to watchlist
+    description: Added to watchlist
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-watchlist-add
+  - id: cinema-status-change
+    kind: timeline-card
+    placement: timeline
+    name: Watching status changed
+    description: Watching status changed
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-status-change
+  - id: cinema-review
+    kind: timeline-card
+    placement: timeline
+    name: Review posted
+    description: Review posted
+    embedPath: /embed/timeline/movie
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-review
+  - id: cinema-search
+    kind: timeline-card
+    placement: timeline
+    name: Cinema search
+    description: Cinema search performed
+    embedPath: /embed/timeline/search
+    permissions:
+      - timeline:write
+    triggers:
+      - cinema-search
+
+wants:
+  - appId: jellyfin
+    name: Jellyfin
+    description: "Media server for streaming"
+    defaultPort: 8096
+internet:
+  proxy:
+    - host: api.themoviedb.org
+      paths:
+        - /3/*
+      methods:
+        - GET
+    - host: image.tmdb.org
+      paths:
+        - /t/p/*
+      methods:
+        - GET
+
+database:
+  mode: shared
+  name: "ye_cinema"
+  user: "ye_cinema"
+
+containers:
+  - name: main
+    type: lxd
+    image: debian/12
+    port: 3000
+    primary: true
+    network: isolated
+    source:
+      repo: YouEye-Platform/Cinema
+      nodeVersion: "22.x"
+      appDir: /opt/app
+    healthCheck:
+      type: http
+      path: /api/health
+      timeout: 120000
+
+secrets:
+  - name: db_password
+    file: .db_password
+    generator: password
+    length: 32
+  - name: jwt_secret
+    file: .jwt_secret
+    generator: secretKey
+    length: 64
+
+backup:
+  strategy: "stop-dump-export"
+  volumes: []
+
+sso:
+  type: oauth2
+  callback_path: /api/auth/callback
+  setup:
+    method: env
+
+env_mapping:
+  DATABASE_URL: "${database.url}"
+  JWT_SECRET: "${secrets.jwt_secret}"
+  IDENTITY_URL: "${identity.externalUrl}"
+  IDENTITY_INTERNAL_URL: "${identity.internalUrl}"
+  IDENTITY_CLIENT_ID: "${sso.client_id}"
+  IDENTITY_CLIENT_SECRET: "${sso.client_secret}"
+  APP_URL: "${app.url}"
+  CINEMA_EXTERNAL_URL: "${app.url}"
+  YOUEYE_GATEWAY: "${integration.gateway_url}"
+  YOUEYE_APP_TOKEN: "${integration.app_token}"
+  YOUEYE_APP_ID: "${app.id}"
+  NODE_ENV: production
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+
+uninstall:
+  dropSharedDatabase: true
+
+update:
+  strategy: replace
+  preserveData: true
+  preserveSecrets: true
