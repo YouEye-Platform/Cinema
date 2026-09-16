@@ -4,7 +4,7 @@ Movie and TV discovery app for the [YouEye](https://github.com/YouEye-Platform/Y
 
 Cinema runs as a native YouEye app. It gives users a media discovery interface, dashboard widgets, and timeline info cards while keeping account, theme, and launch behavior consistent with the rest of YouEye.
 
-Current public release line: `v0.5.0`
+Current development source version: `0.4.4.1.0.2`
 
 ## Features
 
@@ -38,17 +38,23 @@ pnpm dev
 
 Cinema requires a TMDB API key configured through YouEye. The app uses Next.js 15, TypeScript, Tailwind CSS, and YouEye's native app surface contract.
 
-## Release Artifact
-
-The Control Panel updater expects each native app release to upload an uncompressed `standalone.tar` asset.
+## Build and release checks
 
 ```bash
+pnpm test
+pnpm release:check
 pnpm build
-cd .next/standalone
-tar -cf standalone.tar .
 ```
 
-The release tag for this standalone repo is `v0.5.0` with no component prefix.
+The source-owned `.youeye/build/app` entrypoint produces an unsigned
+`standalone.tar` for independent validation, signing, and publication. It
+requires the build environment described in `.youeye/build/manifest.json`.
+Package and install-manifest versions must agree. Development tags use
+`dev-v<version>`; Stable tags use `v<version>`.
+
+The install manifest retains the Forgejo source identity. The public project
+website is documentation metadata, not an instruction to switch update sources.
+See [PUBLIC_RELEASE_POLICY.md](PUBLIC_RELEASE_POLICY.md) for publication rules.
 
 ## License
 

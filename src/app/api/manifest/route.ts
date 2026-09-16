@@ -1,17 +1,7 @@
 import { NextResponse } from "next/server";
 import packageJson from "../../../../package.json";
 
-export async function GET() {
-  return NextResponse.json({
-    id: "ye-cinema",
-    name: "Cinema",
-    version: packageJson.version,
-    description: "Personal movie & TV discovery with watchlists, ratings, and reviews",
-    icon: "Film",
-    accent_color: "#a855f7",
-    permissions: ["timeline:write", "widgets:register"],
-  surfaceSchemaVersion: 1,
-    surfaces: [
+const surfaces = [
     {
       id: "app-settings",
       kind: "settings-panel",
@@ -139,7 +129,19 @@ export async function GET() {
         permissions: ["timeline:write"],
         triggers: ["cinema-search"],
       },
-    ],
+    ];
+
+export async function GET() {
+  return NextResponse.json({
+    id: "ye-cinema",
+    name: "Cinema",
+    version: packageJson.version,
+    description: "Personal movie & TV discovery with watchlists, ratings, and reviews",
+    icon: "Film",
+    accent_color: "#a855f7",
+    permissions: ["timeline:write", "widgets:register"],
+  surfaceSchemaVersion: 1,
+    surfaces,
       internet: {
       proxy: [
         { host: "api.themoviedb.org", paths: ["/3/*"], methods: ["GET"], scope: "user" },

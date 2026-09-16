@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { CinemaSettingsPanel } from "@/app/settings/page";
+import { CinemaSettingsPanel } from "@/app/settings/settings-panel";
 
 export default function SettingsEmbedPage() {
   return (

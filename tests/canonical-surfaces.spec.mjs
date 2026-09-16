@@ -21,7 +21,8 @@ test("Cinema publishes canonical surfaces in runtime and install manifests", () 
 
   assert.match(route, /version: packageJson\.version/);
   assert.match(route, /surfaceSchemaVersion: 1/);
-  assert.match(route, /surfaces:\s*\[/);
+  assert.match(route, /const surfaces\s*=\s*\[/);
+  assert.match(route, /\n\s+surfaces,/);
   assert.match(route, /kind: "settings-panel"/);
   assert.match(route, /kind: "widget"/);
   assert.match(route, /kind: "info-card"/);

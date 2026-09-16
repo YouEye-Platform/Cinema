@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: app
 integration: native
-version: 0.5.0
+version: 0.5.1
 surfaceSchemaVersion: 1
 metadata:
   id: "cinema"
@@ -191,7 +191,7 @@ containers:
     primary: true
     network: isolated
     source:
-      repo: YouEye-Platform/Cinema
+      repo: potemsla/YE-App-Cinema
       nodeVersion: "22.x"
       appDir: /opt/app
     healthCheck:
