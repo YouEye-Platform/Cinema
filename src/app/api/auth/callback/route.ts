@@ -23,10 +23,12 @@ export async function GET(request: NextRequest) {
 
   const userInfo = await fetchUserInfo(config, tokenData.access_token);
   if (!userInfo) return NextResponse.redirect(new URL("/api/auth/sso", request.url));
+  if (!userInfo.sid) return NextResponse.redirect(new URL("/api/auth/sso", request.url));
 
   const isAdmin = (userInfo.groups || []).some((g: string) => g.toLowerCase().includes("admin"));
   const sessionToken = await createSession({
     userId: userInfo.sub,
+    identitySessionId: userInfo.sid,
     username: userInfo.preferred_username || userInfo.name || "user",
     name: userInfo.name || userInfo.preferred_username || "User",
     email: userInfo.email || "",
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
     httpOnly: true,
     secure: process.env.SECURE_COOKIES !== "false",
     sameSite: "lax",
-    maxAge: 86400,
+    maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
   response.cookies.delete("cinema-oauth-state");
