@@ -99,14 +99,14 @@ export async function getSession(appId?: string): Promise<SessionPayload | null>
   const sessionCookie = cookieStore.get(name);
   if (!sessionCookie?.value) return null;
   const session = await verifySession(sessionCookie.value);
-  if (!session?.identitySessionId || !session.userId) return null;
+  if (!session?.identitySessionId || !session.userId || !Number.isSafeInteger(session.iat) || Number(session.iat) <= 0) return null;
   const identityBase = process.env.IDENTITY_INTERNAL_URL || process.env.IDENTITY_URL;
   const clientId = process.env.IDENTITY_CLIENT_ID;
   const clientSecret = process.env.IDENTITY_CLIENT_SECRET;
   if (!identityBase || !clientId || !clientSecret) return null;
   try {
     const check = await fetch(`${identityBase}/identity/session/check`, {
-      headers: { 'x-youeye-expected-sub': session.userId, 'x-youeye-expected-sid': session.identitySessionId, 'x-youeye-client-id': clientId, 'x-youeye-client-secret': clientSecret },
+      headers: { 'x-youeye-expected-sub': session.userId, 'x-youeye-expected-sid': session.identitySessionId, 'x-youeye-session-issued-at': String(session.iat), 'x-youeye-client-id': clientId, 'x-youeye-client-secret': clientSecret },
       cache: 'no-store', signal: AbortSignal.timeout(5000),
     });
     return check.status === 204 ? session : null;
