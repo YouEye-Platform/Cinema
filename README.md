@@ -4,7 +4,7 @@ Movie and TV discovery app for the [YouEye](https://github.com/YouEye-Platform/Y
 
 Cinema runs as a native YouEye app. It gives users a media discovery interface, dashboard widgets, and timeline info cards while keeping account, theme, and launch behavior consistent with the rest of YouEye.
 
-Current development source version: `0.4.4.1.0.2`
+The version in `package.json` and `youeye-app.yaml` is the exact source version.
 
 ## Features
 
