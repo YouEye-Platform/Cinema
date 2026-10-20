@@ -3,7 +3,7 @@ kind: app
 integration: native
 data_ownership:
   per_user: identity_uuid
-version: 0.5.6
+version: 0.5.14
 surfaceSchemaVersion: 1
 metadata:
   id: "cinema"
@@ -194,7 +194,7 @@ containers:
     network: isolated
     source:
       repo: potemsla/YE-App-Cinema
-      nodeVersion: "22.x"
+      nodeVersion: "24.x"
       appDir: /opt/app
     healthCheck:
       type: http

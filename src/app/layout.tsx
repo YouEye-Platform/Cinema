@@ -1,3 +1,4 @@
+import { resolveAppLocale } from "@/lib/locale";
 /**
  * Root Layout — Cinema App
  */
@@ -5,7 +6,7 @@
 import { InstallBanner } from "@/components/pwa/install-banner";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getMessages } from "next-intl/server";
 import "./globals.css";
 import { getSession } from "@/lib/auth";
 import { createApiClient } from "@/lib/api";
@@ -63,8 +64,8 @@ export default async function RootLayout({
   const isSystemTheme = themeMode === "system";
   const htmlClass = isSystemTheme ? "" : themeMode;
 
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const locale = resolveAppLocale(headerConfig?.locale);
+  const messages = await getMessages({ locale });
 
   return (
     <html lang={locale} className={htmlClass} suppressHydrationWarning>
@@ -80,7 +81,7 @@ export default async function RootLayout({
         )}
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {session && <CinemaHeader />}
           {session && <LaunchRequirementsBanner appName="Cinema" requirements={launchRequirements} />}
           <main>{children}</main>
