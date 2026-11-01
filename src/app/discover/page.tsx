@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { MovieCard } from "@/components/cinema/movie-card";
@@ -22,6 +24,8 @@ interface Genre {
 }
 
 export default function DiscoverPage() {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [mediaType, setMediaType] = useState<"movie" | "tv">("movie");
   const [genres, setGenres] = useState<readonly Genre[]>([]);
   const [selectedGenre, setSelectedGenre] = useState("all");
@@ -65,7 +69,7 @@ export default function DiscoverPage() {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6">
-      <h1 className="text-2xl font-bold mb-6">Discover</h1>
+      <h1 className="text-2xl font-bold mb-6">{translateInterface("md4a33d5b78bc")}</h1>
 
       <FilterPanel
         mediaType={mediaType}
@@ -104,7 +108,7 @@ export default function DiscoverPage() {
             <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
+            <span className="text-sm text-muted-foreground">{translateInterface("m0a30a815d67d")}{" "}{page} {" "}{translateInterface("m28391d3bc64e")}{" "}{totalPages}</span>
             <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
               <ChevronRight className="h-4 w-4" />
             </Button>

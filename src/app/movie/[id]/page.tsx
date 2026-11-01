@@ -1,5 +1,11 @@
 "use client";
+import {useLocale as useFormatLocale} from "next-intl";
 
+import { useLocale as useInterfaceLocale } from "next-intl";
+
+
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { Star, Clock, ExternalLink, Loader2 } from "lucide-react";
@@ -48,6 +54,12 @@ interface UserItem {
 }
 
 export default function MovieDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const formatLocale = useFormatLocale();
+
+  const interfaceLocale = useInterfaceLocale();
+
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { id } = use(params);
   const [movie, setMovie] = useState<TMDBMovie | null>(null);
   const [userItem, setUserItem] = useState<UserItem | null>(null);
@@ -74,12 +86,12 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   if (!movie) {
-    return <div className="p-6 text-center text-muted-foreground">Movie not found</div>;
+    return <div className="p-6 text-center text-muted-foreground">{translateInterface("ma603fddc115d")}</div>;
   }
 
   const year = movie.release_date?.slice(0, 4) || "";
   const runtime = movie.runtime
-    ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
+    ? translateInterface("m425dc6c72de6", {hours: Math.floor(movie.runtime / 60), minutes: movie.runtime % 60})
     : null;
   const director = movie.credits?.crew.find((c) => c.job === "Director");
   const writer = movie.credits?.crew.find((c) => c.job === "Writer" || c.job === "Screenplay");
@@ -99,6 +111,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
       {movie.backdrop_path && (
         <div className="relative w-full h-72 md:h-96 overflow-hidden">
           <Image
+            unoptimized
             src={`/api/tmdb/image/t/p/w1280${movie.backdrop_path}`}
             alt={movie.title}
             fill
@@ -118,6 +131,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
             <div className="flex-shrink-0">
               <div className="relative w-44 aspect-[2/3] rounded-xl overflow-hidden shadow-xl">
                 <Image
+            unoptimized
                   src={`/api/tmdb/image/t/p/w500${movie.poster_path}`}
                   alt={movie.title}
                   fill
@@ -146,7 +160,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
               {movie.vote_average > 0 && (
                 <span className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                  {movie.vote_average.toFixed(1)} ({movie.vote_count.toLocaleString()})
+                  {new Intl.NumberFormat(formatLocale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(movie.vote_average)} ({movie.vote_count.toLocaleString(interfaceLocale)})
                 </span>
               )}
             </div>
@@ -168,7 +182,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
               <div className="flex flex-wrap gap-4 mb-4 text-sm">
                 {director && (
                   <div>
-                    <span className="text-muted-foreground">Director: </span>
+                    <span className="text-muted-foreground">{translateInterface("m29718cd4d5b9")}{" "}</span>
                     <a href={`/person/${director.id}`} className="hover:text-primary transition-colors">
                       {director.name}
                     </a>
@@ -176,7 +190,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
                 )}
                 {writer && (
                   <div>
-                    <span className="text-muted-foreground">Writer: </span>
+                    <span className="text-muted-foreground">{translateInterface("m9e02677b1887")}{" "}</span>
                     <a href={`/person/${writer.id}`} className="hover:text-primary transition-colors">
                       {writer.name}
                     </a>
@@ -193,13 +207,13 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
                 onValueChange={handleStatusChange}
               >
                 <SelectTrigger className="w-44 h-9">
-                  <SelectValue placeholder="Set Status" />
+                  <SelectValue placeholder={translateInterface("m981d4cec8228")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="want_to_watch">Want to Watch</SelectItem>
-                  <SelectItem value="watching">Watching</SelectItem>
-                  <SelectItem value="watched">Watched</SelectItem>
-                  <SelectItem value="dropped">Dropped</SelectItem>
+                  <SelectItem value="want_to_watch">{translateInterface("m02e740aaf70d")}</SelectItem>
+                  <SelectItem value="watching">{translateInterface("mfbc594054d51")}</SelectItem>
+                  <SelectItem value="watched">{translateInterface("m1ca8c1c0de6f")}</SelectItem>
+                  <SelectItem value="dropped">{translateInterface("m739f68fe97ad")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -238,7 +252,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
 
         {/* Review */}
         <div className="mb-8 p-4 bg-muted/30 rounded-xl">
-          <h2 className="text-lg font-semibold mb-3">Your Review</h2>
+          <h2 className="text-lg font-semibold mb-3">{translateInterface("m113fcf1cbe69")}</h2>
           <ReviewEditor
             tmdbId={movie.id}
             mediaType="movie"
@@ -250,7 +264,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
         {/* Cast */}
         {(movie.credits?.cast?.length ?? 0) > 0 && (
           <div className="mb-8">
-            <Carousel title="Cast">
+            <Carousel title={translateInterface("m150040557337")}>
               {movie.credits!.cast.slice(0, 20).map((person) => (
                 <PersonCard
                   key={person.id}
@@ -266,7 +280,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
 
         {/* Similar */}
         {(movie.similar?.results?.length ?? 0) > 0 && (
-          <Carousel title="Similar Movies">
+          <Carousel title={translateInterface("m6595be82bc46")}>
             {movie.similar!.results.slice(0, 20).map((item) => (
               <MovieCard
                 key={item.id}

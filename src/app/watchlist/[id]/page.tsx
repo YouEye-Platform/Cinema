@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
+
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
@@ -22,6 +24,8 @@ interface Watchlist {
 }
 
 export default function WatchlistDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { id } = use(params);
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<Watchlist | null>(null);
@@ -45,8 +49,7 @@ export default function WatchlistDetailPage({ params }: { params: Promise<{ id: 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6">
       <button onClick={() => router.push("/watchlist")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
-        <ArrowLeft className="h-4 w-4" />Back to watchlists
-      </button>
+        <ArrowLeft className="h-4 w-4" />{translateInterface("m3c2f2badc114")}</button>
 
       <h1 className="text-2xl font-bold mb-1">{watchlist.name}</h1>
       {watchlist.description && <p className="text-muted-foreground mb-6">{watchlist.description}</p>}
@@ -54,7 +57,7 @@ export default function WatchlistDetailPage({ params }: { params: Promise<{ id: 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Film className="h-12 w-12 mb-3 opacity-50" />
-          <p>This watchlist is empty</p>
+          <p>{translateInterface("m76ad9a57b8ad")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -83,7 +86,7 @@ function ItemCard({ item }: { item: WatchlistItem }) {
     <a href={`/${item.media_type}/${item.tmdb_id}`} className="block group">
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted mb-2">
         {tmdb?.poster_path ? (
-          <Image src={`/api/tmdb/image/t/p/w342${tmdb.poster_path}`} alt={title} fill className="object-cover" sizes="200px" />
+          <Image unoptimized src={`/api/tmdb/image/t/p/w342${tmdb.poster_path}`} alt={title} fill className="object-cover" sizes="200px" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs text-center p-2">{title}</div>
         )}

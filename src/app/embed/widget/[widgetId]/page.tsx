@@ -1,3 +1,7 @@
+
+import {useLocale as useFormatLocale} from "next-intl";
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { getSession } from "@/lib/auth";
 import { getMany } from "@/lib/db/client";
 import { runMigrations } from "@/lib/db/migrate";
@@ -88,18 +92,20 @@ async function fetchTrending(userId: string): Promise<TrendingItem[]> {
 /* ─── Page ───────────────────────────────────────────────── */
 
 export default async function CinemaWidgetPage({ params }: WidgetPageProps) {
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const { widgetId } = await params;
   await runMigrations();
 
   if (widgetId === "now-watching") {
     const session = await getSession("ye-cinema").catch(() => null);
     if (!session) {
-      return <EmptyState message="Sign in to see your watchlist." icon="lock" />;
+      return <EmptyState message={translateInterface("m7b472f0ec6a7")} icon="lock" />;
     }
 
     const items = await fetchNowWatching(session.userId);
     if (items.length === 0) {
-      return <EmptyState message="Nothing in your watchlist yet." icon="film" />;
+      return <EmptyState message={translateInterface("mef0d87888ac7")} icon="film" />;
     }
 
     return <NowWatchingWidget items={items} />;
@@ -108,23 +114,25 @@ export default async function CinemaWidgetPage({ params }: WidgetPageProps) {
   if (widgetId === "trending") {
     const session = await getSession("ye-cinema").catch(() => null);
     if (!session) {
-      return <EmptyState message="Sign in to see trending movies." icon="lock" />;
+      return <EmptyState message={translateInterface("md56d87626b8e")} icon="lock" />;
     }
 
     const items = await fetchTrending(session.userId);
     if (items.length === 0) {
-      return <EmptyState message="Could not load trending movies." icon="film" />;
+      return <EmptyState message={translateInterface("ma8d77d2959a3")} icon="film" />;
     }
 
     return <TrendingWidget items={items} />;
   }
 
-  return <EmptyState message="Unknown widget." icon="alert" />;
+  return <EmptyState message={translateInterface("mec29e7f61294")} icon="alert" />;
 }
 
 /* ─── Now Watching — Poster Card Scroll ──────────────────── */
 
 function NowWatchingWidget({ items }: { items: WatchItem[] }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   return (
     <div className="h-full flex flex-col p-3 overflow-hidden">
       {/* Horizontal scroll of poster cards */}
@@ -162,13 +170,11 @@ function NowWatchingWidget({ items }: { items: WatchItem[] }) {
                 {item.status === "watching" ? (
                   <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/90 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm">
                     <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                    Watching
-                  </span>
+                    {translateInterface("mfbc594054d51")}</span>
                 ) : (
                   <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/90 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm">
                     <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>
-                    Watched
-                  </span>
+                    {translateInterface("m1ca8c1c0de6f")}</span>
                 )}
               </div>
 
@@ -200,6 +206,8 @@ function NowWatchingWidget({ items }: { items: WatchItem[] }) {
 /* ─── Trending — Featured + Ranked List ──────────────────── */
 
 function TrendingWidget({ items }: { items: TrendingItem[] }) {
+  const formatLocale = useFormatLocale();
+
   const [featured, ...rest] = items;
 
   return (
@@ -253,7 +261,7 @@ function TrendingWidget({ items }: { items: TrendingItem[] }) {
               {featured.voteAverage && (
                 <span className="inline-flex items-center gap-0.5 text-[10px]">
                   <svg className="w-2.5 h-2.5 text-amber-500 fill-amber-500" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  <span className="font-semibold text-foreground">{featured.voteAverage.toFixed(1)}</span>
+                  <span className="font-semibold text-foreground">{new Intl.NumberFormat(formatLocale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(featured.voteAverage)}</span>
                 </span>
               )}
             </div>
@@ -305,7 +313,7 @@ function TrendingWidget({ items }: { items: TrendingItem[] }) {
                 {item.voteAverage && (
                   <span className="inline-flex items-center gap-0.5 text-[10px]">
                     <svg className="w-2.5 h-2.5 text-amber-500 fill-amber-500" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <span className="font-medium text-foreground">{item.voteAverage.toFixed(1)}</span>
+                    <span className="font-medium text-foreground">{new Intl.NumberFormat(formatLocale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(item.voteAverage)}</span>
                   </span>
                 )}
               </div>

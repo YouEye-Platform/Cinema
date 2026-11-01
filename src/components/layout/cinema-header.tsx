@@ -1,3 +1,4 @@
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
 
 import Link from "next/link";
 /**
@@ -24,6 +25,8 @@ function kebabToPascal(s: string): string {
 }
 
 export async function CinemaHeader() {
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const session = await getSession("ye-cinema");
   if (!session) return null;
 
@@ -66,7 +69,7 @@ export async function CinemaHeader() {
     : undefined;
 
   const appItems = [
-    ...(appSettingsUrl ? [{ label: "App Settings", icon: "Sliders", href: appSettingsUrl }] : []),
+    ...(appSettingsUrl ? [{ label: translateInterface("mda645334193e"), icon: "Sliders", href: appSettingsUrl }] : []),
   ];
 
   // Find this app's branding in the header config
@@ -119,8 +122,8 @@ export async function CinemaHeader() {
         <div className="ye-mobile-top-center flex min-w-0 items-center justify-center gap-3">
           <HeaderSearch />
           <nav className="hidden lg:flex items-center gap-1">
-            <Link href="/" className="px-3 py-1.5 text-sm rounded-md hover:bg-accent/50 transition-colors" prefetch={false}>Discover</Link>
-            <Link href="/watchlist" className="px-3 py-1.5 text-sm rounded-md hover:bg-accent/50 transition-colors text-muted-foreground" prefetch={false}>Watchlist</Link>
+            <Link href="/" className="px-3 py-1.5 text-sm rounded-md hover:bg-accent/50 transition-colors" prefetch={false}>{translateInterface("md4a33d5b78bc")}</Link>
+            <Link href="/watchlist" className="px-3 py-1.5 text-sm rounded-md hover:bg-accent/50 transition-colors text-muted-foreground" prefetch={false}>{translateInterface("meff2ec588be1")}</Link>
           </nav>
         </div>
 
@@ -142,8 +145,8 @@ export async function CinemaHeader() {
 
       <div className="ye-mobile-shell-only fixed inset-x-0 bottom-0 z-50 items-center gap-2 border-t border-border/60 bg-background/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-xl">
         <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-          <Link href="/" className="inline-flex h-12 min-w-12 items-center justify-center rounded-2xl px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" prefetch={false}>Discover</Link>
-          <Link href="/watchlist" className="inline-flex h-12 min-w-12 items-center justify-center rounded-2xl px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" prefetch={false}>Watchlist</Link>
+          <Link href="/" className="inline-flex h-12 min-w-12 items-center justify-center rounded-2xl px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" prefetch={false}>{translateInterface("md4a33d5b78bc")}</Link>
+          <Link href="/watchlist" className="inline-flex h-12 min-w-12 items-center justify-center rounded-2xl px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" prefetch={false}>{translateInterface("meff2ec588be1")}</Link>
         </nav>
         <MobileAccountSheet
           username={user.username ?? user.name ?? ""}

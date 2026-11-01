@@ -28,6 +28,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ tmdbId: string }> }
 ) {
+  const timestamp = new Date().toISOString();
   const session = await getSession("ye-cinema");
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   await runMigrations();
@@ -65,12 +66,12 @@ export async function PUT(
     const voteAvg = (tmdbData.vote_average || null) as number | null;
 
     if (status === "watched") {
-      await emitMovieWatched(session.userId, tmdbIdNum, media_type, title, overview, posterPath, user_rating || null, year, voteAvg);
+      await emitMovieWatched(session.userId, tmdbIdNum, media_type, title, overview, posterPath, user_rating || null, year, voteAvg, timestamp);
     } else if (status) {
-      await emitStatusChange(session.userId, tmdbIdNum, media_type, title, status, posterPath, year);
+      await emitStatusChange(session.userId, tmdbIdNum, media_type, title, status, posterPath, year, timestamp);
     }
     if (review_text?.trim()) {
-      await emitReviewPosted(session.userId, tmdbIdNum, media_type, title, review_text, posterPath, user_rating || null, year);
+      await emitReviewPosted(session.userId, tmdbIdNum, media_type, title, review_text, posterPath, user_rating || null, year, timestamp);
     }
   } catch {
     // Non-critical

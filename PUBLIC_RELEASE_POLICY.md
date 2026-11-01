@@ -19,6 +19,8 @@ it is source-bound product metadata, not an Infra manifest or replacement for
 Infra validation, provenance, SBOM, signing, or publication records.
 
 A promotion must bind an exact source commit, source epoch, version, branch,
-tag, artifact digest, SBOM, provenance, and destination. The version inside
-`standalone.tar` and the runtime `/api/manifest` must match the release tag.
+tag, artifact digest, SBOM, provenance, and destination. For legacy releases the version inside `standalone.tar` matches the release
+tag. With the artifact-promotion capability it remains the immutable build
+version; `/api/manifest` reads the accepted external product release version.
+Both the original build and new release signatures must verify independently.
 Existing tags and assets are immutable.

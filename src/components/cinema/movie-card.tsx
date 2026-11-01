@@ -1,8 +1,9 @@
 "use client";
+import { useLocale, useTranslations as useInterfaceTranslations } from "next-intl";
 
 import { useState } from "react";
 import Image from "next/image";
-import { Star } from "lucide-react";
+import { Star, Film } from "lucide-react";
 
 interface MovieCardProps {
   readonly id: number;
@@ -15,6 +16,8 @@ interface MovieCardProps {
 }
 
 export function MovieCard({ id, mediaType, title, posterPath, year, rating, onClick }: MovieCardProps) {
+  const locale = useLocale();
+  const translateInterface = useInterfaceTranslations("interface");
   const [imgError, setImgError] = useState(false);
   const href = `/${mediaType}/${id}`;
 
@@ -29,21 +32,23 @@ export function MovieCard({ id, mediaType, title, posterPath, year, rating, onCl
     <a
       href={href}
       onClick={handleClick}
-      className="group block flex-shrink-0 w-36 cursor-pointer"
+      className="group block flex-shrink-0 w-40 cursor-pointer rounded-xl"
     >
-      <div className="relative overflow-hidden rounded-lg bg-muted aspect-[2/3] mb-2">
+      <div className="relative overflow-hidden rounded-xl bg-muted aspect-[2/3] mb-2">
         {posterPath && !imgError ? (
           <Image
+            unoptimized
             src={`/api/tmdb/image/t/p/w342${posterPath}`}
             alt={title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             onError={() => setImgError(true)}
-            sizes="144px"
+            sizes="160px"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs text-center p-2">
-            {title}
+          <div className="w-full h-full flex flex-col gap-3 items-center justify-center text-muted-foreground text-sm text-center p-4">
+            <Film className="h-8 w-8" aria-hidden="true" />
+            <span>{translateInterface("uxArtworkUnavailable")}</span>
           </div>
         )}
 
@@ -56,13 +61,13 @@ export function MovieCard({ id, mediaType, title, posterPath, year, rating, onCl
         {rating && rating > 0 && (
           <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 bg-black/70 text-yellow-400 text-xs px-1.5 py-0.5 rounded-full">
             <Star className="h-2.5 w-2.5 fill-yellow-400" />
-            <span>{rating.toFixed(1)}</span>
+            <span>{rating.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
           </div>
         )}
       </div>
 
       <div className="px-0.5">
-        <p className="text-sm font-medium line-clamp-2 text-foreground group-hover:text-primary transition-colors">
+        <p className="text-base font-medium line-clamp-2 text-foreground group-hover:text-primary transition-colors">
           {title}
         </p>
         {year && (

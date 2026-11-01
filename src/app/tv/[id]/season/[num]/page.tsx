@@ -1,4 +1,6 @@
 "use client";
+import { useLocale, useTranslations as useInterfaceTranslations } from "next-intl";
+
 
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
@@ -23,6 +25,9 @@ interface Season {
 }
 
 export default function SeasonPage({ params }: { params: Promise<{ id: string; num: string }> }) {
+  const translateInterface = useInterfaceTranslations("interface");
+  const locale = useLocale();
+
   const { id, num } = use(params);
   const [season, setSeason] = useState<Season | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,24 +40,23 @@ export default function SeasonPage({ params }: { params: Promise<{ id: string; n
   }, [id, num]);
 
   if (loading) return <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
-  if (!season) return <div className="p-6 text-center text-muted-foreground">Season not found</div>;
+  if (!season) return <div className="p-6 text-center text-muted-foreground">{translateInterface("m41e423e4fc15")}</div>;
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6">
       <a href={`/tv/${id}`} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
         <ArrowLeft className="h-4 w-4" />
-        Back to show
-      </a>
+        {translateInterface("m5d12d2a493d1")}</a>
 
       <div className="flex gap-6 mb-8">
         {season.poster_path && (
           <div className="relative w-32 aspect-[2/3] rounded-xl overflow-hidden flex-shrink-0">
-            <Image src={`/api/tmdb/image/t/p/w342${season.poster_path}`} alt={season.name} fill className="object-cover" sizes="128px" />
+            <Image unoptimized src={`/api/tmdb/image/t/p/w342${season.poster_path}`} alt={season.name} fill className="object-cover" sizes="128px" />
           </div>
         )}
         <div>
           <h1 className="text-2xl font-bold mb-2">{season.name}</h1>
-          <p className="text-muted-foreground text-sm">{season.air_date?.slice(0, 4)} • {season.episodes?.length} episodes</p>
+          <p className="text-muted-foreground text-sm">{season.air_date?.slice(0, 4)} • {translateInterface("m8870229e7e13", { count: season.episodes?.length ?? 0 })}</p>
           {season.overview && <p className="text-sm leading-relaxed mt-3">{season.overview}</p>}
         </div>
       </div>
@@ -62,7 +66,7 @@ export default function SeasonPage({ params }: { params: Promise<{ id: string; n
           <div key={ep.id} className="flex gap-4 p-4 bg-muted/20 rounded-xl border border-border/40">
             {ep.still_path && (
               <div className="relative w-32 aspect-video rounded-lg overflow-hidden flex-shrink-0">
-                <Image src={`/api/tmdb/image/t/p/w300${ep.still_path}`} alt={ep.name} fill className="object-cover" sizes="128px" />
+                <Image unoptimized src={`/api/tmdb/image/t/p/w300${ep.still_path}`} alt={ep.name} fill className="object-cover" sizes="128px" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -71,7 +75,7 @@ export default function SeasonPage({ params }: { params: Promise<{ id: string; n
                   <span className="text-muted-foreground text-sm mr-1">E{ep.episode_number}</span>
                   {ep.name}
                 </h3>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{ep.runtime ? `${ep.runtime}m` : ""}</span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">{ep.runtime ? new Intl.NumberFormat(locale, {style: "unit", unit: "minute", unitDisplay: "short"}).format(ep.runtime) : ""}</span>
               </div>
               <p className="text-xs text-muted-foreground mb-2">{ep.air_date}</p>
               {ep.overview && <p className="text-sm text-muted-foreground line-clamp-2">{ep.overview}</p>}

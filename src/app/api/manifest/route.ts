@@ -1,3 +1,4 @@
+import { installedRelease } from "@/lib/installed-release";
 import { NextResponse } from "next/server";
 import packageJson from "../../../../package.json";
 
@@ -132,10 +133,13 @@ const surfaces = [
     ];
 
 export async function GET() {
+  const release = await installedRelease("cinema", packageJson.version);
   return NextResponse.json({
     id: "ye-cinema",
     name: "Cinema",
-    version: packageJson.version,
+    version: release?.version ?? "unknown",
+    buildVersion: packageJson.version,
+    release,
     description: "Personal movie & TV discovery with watchlists, ratings, and reviews",
     icon: "Film",
     accent_color: "#a855f7",

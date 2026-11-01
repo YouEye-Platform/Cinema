@@ -1,3 +1,6 @@
+import {getLocale as getFormatLocale} from "next-intl/server";
+import { getTranslations as getInterfaceTranslations } from "next-intl/server";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 /**
  * Cinema Info Card — Rich movie/TV embed for Search RHS
  *
@@ -91,17 +94,21 @@ interface WatchlistItem {
 }
 
 export default async function MovieCardPage({ searchParams }: CardPageProps) {
+  const formatLocale = await getFormatLocale();
+
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const params = await searchParams;
   const { url } = params;
   const containerWidth = parseInt(params.w || "480", 10);
 
   if (!url) {
-    return <CardError message="No URL provided" />;
+    return <CardError message={translateInterface("mad585f4506b2")} />;
   }
 
   const extracted = extractTMDBId(url);
   if (!extracted) {
-    return <CardError message="URL not recognized" />;
+    return <CardError message={translateInterface("m05a5dd92e1f4")} />;
   }
 
   await runMigrations();
@@ -130,7 +137,7 @@ export default async function MovieCardPage({ searchParams }: CardPageProps) {
         }, userId)) as unknown as TMDBData;
         mediaType = "tv";
       } else {
-        return <CardError message="Not found on TMDB" />;
+        return <CardError message={translateInterface("me743b72f597e")} />;
       }
     } else {
       tmdbData = (await tmdbFetch(`/${mediaType}/${extracted.id}`, {
@@ -174,19 +181,19 @@ export default async function MovieCardPage({ searchParams }: CardPageProps) {
       )) as WatchlistItem | null;
     }
 
-    const title = tmdbData.title || tmdbData.name || "Unknown";
+    const title = tmdbData.title || tmdbData.name || translateInterface("mb764cdc0eab7");
     const tagline = tmdbData.tagline || "";
     const year = (tmdbData.release_date || tmdbData.first_air_date || "").slice(0, 4);
     const genres = (tmdbData.genres || []).map((g) => g.name);
     const runtime = tmdbData.runtime
-      ? `${Math.floor(tmdbData.runtime / 60)}h ${tmdbData.runtime % 60}m`
+      ? translateInterface("m425dc6c72de6", {hours: Math.floor(tmdbData.runtime / 60), minutes: tmdbData.runtime % 60})
       : null;
     const seasonInfo =
       tmdbData.number_of_seasons
-        ? `${tmdbData.number_of_seasons} season${tmdbData.number_of_seasons !== 1 ? "s" : ""}` +
-          (tmdbData.number_of_episodes ? ` · ${tmdbData.number_of_episodes} episodes` : "")
+        ? translateInterface("m1789d2238e4e", {count: tmdbData.number_of_seasons}) +
+          (tmdbData.number_of_episodes ? " · " + translateInterface("m8870229e7e13", {count: tmdbData.number_of_episodes}) : "")
         : null;
-    const rating = tmdbData.vote_average ? tmdbData.vote_average.toFixed(1) : null;
+    const rating = tmdbData.vote_average ? new Intl.NumberFormat(formatLocale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(tmdbData.vote_average) : null;
     const voteCount = tmdbData.vote_count ?? 0;
     const overview = tmdbData.overview || "";
     const poster = getImageUrl(tmdbData.poster_path || null, containerWidth >= 400 ? "w342" : "w185");
@@ -265,7 +272,7 @@ export default async function MovieCardPage({ searchParams }: CardPageProps) {
   } catch (err) {
     return (
       <CardError
-        message={`Failed to load: ${err instanceof Error ? err.message : "Unknown error"}`}
+        message={translateInterface("m5232c0639543")}
       />
     );
   }
@@ -316,6 +323,8 @@ function RichCard({
   cinemaUrl: string | null;
   hasSession: boolean;
 }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   return (
     <div className="overflow-hidden bg-card text-foreground">
       {/* Backdrop hero */}
@@ -392,7 +401,7 @@ function RichCard({
                 </div>
                 {voteCount > 0 && (
                   <span className="text-xs text-muted-foreground">
-                    {voteCount > 1000 ? `${(voteCount / 1000).toFixed(1)}K` : voteCount} votes
+                    {translateInterface("m0a1eb8c14ab2", { count: voteCount })}
                   </span>
                 )}
               </div>
@@ -425,10 +434,10 @@ function RichCard({
         {watchlistItem && (
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
             <BookmarkCheck className="h-3.5 w-3.5" />
-            {watchlistItem.status === "watched" ? "Watched" : "In Watchlist"}
+            {watchlistItem.status === "watched" ? translateInterface("m1ca8c1c0de6f") : translateInterface("m111b9aed70cc")}
             {watchlistItem.user_rating && (
               <span className="ml-1 text-muted-foreground">
-                — rated {watchlistItem.user_rating}/10
+                {translateInterface("m3384af5d5a75", { rating: watchlistItem.user_rating })}
               </span>
             )}
           </div>
@@ -438,8 +447,7 @@ function RichCard({
         {overview && (
           <div className="mt-4">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
-              Overview
-            </h3>
+              {translateInterface("md4b1ea5708dd")}</h3>
             <p className="text-sm leading-relaxed text-foreground/90">
               {overview}
             </p>
@@ -451,14 +459,14 @@ function RichCard({
           <div className="mt-4 space-y-1 text-sm">
             {director && (
               <p>
-                <span className="font-medium text-foreground">Director</span>{" "}
+                <span className="font-medium text-foreground">{translateInterface("mc149bc14e45c")}</span>{" "}
                 <span className="text-muted-foreground">{director}</span>
               </p>
             )}
             {writers.length > 0 && (
               <p>
                 <span className="font-medium text-foreground">
-                  {writers.length === 1 ? "Writer" : "Writers"}
+                  {writers.length === 1 ? translateInterface("m0e3c5fe00f66") : translateInterface("mfe3d89783b11")}
                 </span>{" "}
                 <span className="text-muted-foreground">{writers.join(", ")}</span>
               </p>
@@ -470,8 +478,7 @@ function RichCard({
         {cast.length > 0 && (
           <div className="mt-4">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-              Cast
-            </h3>
+              {translateInterface("m150040557337")}</h3>
             <div className="grid grid-cols-2 gap-x-3 gap-y-2">
               {cast.map((c) => (
                 <div key={c.name} className="flex items-center gap-2 min-w-0">
@@ -506,8 +513,7 @@ function RichCard({
         {watchProviders.length > 0 && (
           <div className="mt-4">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-              Where to Watch
-            </h3>
+              {translateInterface("mcb7730733153")}</h3>
             <div className="flex flex-wrap gap-2">
               {watchProviders.map((p) => (
                 <div
@@ -533,8 +539,7 @@ function RichCard({
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
               >
-                via JustWatch
-                <ExternalLink className="h-2.5 w-2.5" />
+                {translateInterface("ma09859aca45c")}<ExternalLink className="h-2.5 w-2.5" />
               </a>
             )}
           </div>
@@ -549,8 +554,7 @@ function RichCard({
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-all hover:shadow-md"
             >
               <Play className="h-4 w-4" />
-              View in Cinema
-            </a>
+              {translateInterface("m8f7b673ea342")}</a>
           )}
           {!watchlistItem && hasSession && cinemaUrl && (
             <a
@@ -559,8 +563,7 @@ function RichCard({
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-all hover:shadow-sm"
             >
               <Bookmark className="h-4 w-4" />
-              Add to Watchlist
-            </a>
+              {translateInterface("m2bae6c86af29")}</a>
           )}
         </div>
       </div>
@@ -603,6 +606,8 @@ function CompactCard({
   cinemaUrl: string | null;
   hasSession: boolean;
 }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   return (
     <div className="p-3">
       {/* Accent line */}
@@ -648,7 +653,7 @@ function CompactCard({
           {watchlistItem && (
             <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
               <BookmarkCheck className="h-3 w-3" />
-              {watchlistItem.status === "watched" ? "Watched" : "In Watchlist"}
+              {watchlistItem.status === "watched" ? translateInterface("m1ca8c1c0de6f") : translateInterface("m111b9aed70cc")}
             </div>
           )}
         </div>
@@ -667,24 +672,22 @@ function CompactCard({
       )}
       <div className="mt-2.5 space-y-1 text-xs text-muted-foreground">
         {director && (
-          <p><span className="font-medium text-foreground">Director:</span> {director}</p>
+          <p><span className="font-medium text-foreground">{translateInterface("m29718cd4d5b9")}</span> {director}</p>
         )}
         {cast.length > 0 && (
-          <p><span className="font-medium text-foreground">Cast:</span> {cast.map((c) => c.name).join(", ")}</p>
+          <p><span className="font-medium text-foreground">{translateInterface("m3d374b3eddc4")}</span> {cast.map((c) => c.name).join(", ")}</p>
         )}
       </div>
       <div className="mt-3 flex gap-2">
         {cinemaUrl && (
           <a href={cinemaUrl} target="_top" className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-all hover:shadow-md">
             <Film className="h-3 w-3" />
-            View in Cinema
-          </a>
+            {translateInterface("m8f7b673ea342")}</a>
         )}
         {!watchlistItem && hasSession && cinemaUrl && (
           <a href={`${cinemaUrl}?action=add-watchlist`} target="_top" className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground hover:bg-accent transition-all hover:shadow-sm">
             <Bookmark className="h-3 w-3" />
-            Add to Watchlist
-          </a>
+            {translateInterface("m2bae6c86af29")}</a>
         )}
       </div>
     </div>

@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
+
 
 import { useState } from "react";
 import { Star } from "lucide-react";
@@ -11,6 +13,8 @@ interface RatingStarsProps {
 }
 
 export function RatingStars({ value, onChange, readonly = false }: RatingStarsProps) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [hovered, setHovered] = useState<number | null>(null);
 
   const display = hovered ?? value ?? 0;
@@ -29,7 +33,7 @@ export function RatingStars({ value, onChange, readonly = false }: RatingStarsPr
             "transition-colors",
             readonly ? "cursor-default" : "cursor-pointer hover:scale-110 transition-transform"
           )}
-          aria-label={`Rate ${star} out of 10`}
+          aria-label={translateInterface("m4c0e3abf48b7", { value0: String(star) })}
         >
           <Star
             className={cn(

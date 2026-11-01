@@ -1,9 +1,11 @@
+import {getTranslations} from "next-intl/server";
 import { getSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { getMany } from "@/lib/db/client";
 import { runMigrations } from "@/lib/db/migrate";
 
 export async function POST(request: Request) {
+  const translateInterface = await getTranslations("interface");
   const session = await getSession("ye-cinema");
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   await runMigrations();
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       provider: "ye-cinema",
       results: results.map((r) => ({
-        title: `${r.media_type === "movie" ? "Movie" : "TV"} ID ${r.tmdb_id}`,
+        title: translateInterface(r.media_type === "movie" ? "movieIdentity" : "tvIdentity", {id: String(r.tmdb_id)}),
         preview: r.review_text ? String(r.review_text).slice(0, 150) : `Status: ${r.status}`,
         url: `${externalUrl}/${r.media_type}/${r.tmdb_id}`,
         updated_at: r.added_at,

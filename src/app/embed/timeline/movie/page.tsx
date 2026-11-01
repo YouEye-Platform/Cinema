@@ -1,3 +1,5 @@
+import { useTranslations as useInterfaceTranslations } from "next-intl";
+import { getLocale, getTranslations as getInterfaceTranslations } from "next-intl/server";
 /**
  * Cinema Timeline Embed — Movie/TV Card
  *
@@ -43,12 +45,12 @@ interface TMDBData {
   genres?: Array<{ id: number; name: string }>;
 }
 
-const ACTION_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  viewed: { label: "Viewed", icon: "eye", color: "text-blue-500" },
-  "watchlist-add": { label: "Added to Watchlist", icon: "list-plus", color: "text-green-500" },
-  "status-change": { label: "Status Changed", icon: "film", color: "text-amber-500" },
-  review: { label: "Reviewed", icon: "pencil", color: "text-purple-500" },
-  watched: { label: "Watched", icon: "play", color: "text-emerald-500" },
+const ACTION_LABELS: Record<string, { labelKey: string; icon: string; color: string }> = {
+  viewed: { labelKey: "m1b28d17855a7", icon: "eye", color: "text-blue-500" },
+  "watchlist-add": { labelKey: "mca54b78c57df", icon: "list-plus", color: "text-green-500" },
+  "status-change": { labelKey: "mdf479f7b4508", icon: "film", color: "text-amber-500" },
+  review: { labelKey: "mfad6057bb540", icon: "pencil", color: "text-purple-500" },
+  watched: { labelKey: "m1ca8c1c0de6f", icon: "play", color: "text-emerald-500" },
 };
 
 const ACTION_ICONS: Record<string, typeof Film> = {
@@ -60,11 +62,14 @@ const ACTION_ICONS: Record<string, typeof Film> = {
 };
 
 export default async function TimelineMoviePage({ searchParams }: PageProps) {
+  const locale = await getLocale();
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const params = await searchParams;
   const { id, type: mediaType = "movie", action = "viewed", status, rating } = params;
 
   if (!id) {
-    return <ErrorCard message="No movie ID provided" />;
+    return <ErrorCard message={translateInterface("m64e5bdfdbeac")} />;
   }
 
   await runMigrations();
@@ -72,15 +77,15 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
   try {
     const data = (await tmdbFetch(`/${mediaType}/${id}`)) as unknown as TMDBData;
 
-    const title = data.title || data.name || "Unknown";
+    const title = data.title || data.name || translateInterface("mb764cdc0eab7");
     const year = (data.release_date || data.first_air_date || "").slice(0, 4);
     const poster = getImageUrl(data.poster_path || null, "w185");
-    const tmdbRating = data.vote_average ? data.vote_average.toFixed(1) : null;
+    const tmdbRating = data.vote_average ? data.vote_average.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1}) : null;
     const runtime = data.runtime
-      ? `${Math.floor(data.runtime / 60)}h ${data.runtime % 60}m`
+      ? translateInterface("mcf8484035b7f", { hours: Math.floor(data.runtime / 60), minutes: data.runtime % 60 })
       : null;
     const seasonInfo = data.number_of_seasons
-      ? `${data.number_of_seasons} season${data.number_of_seasons !== 1 ? "s" : ""}`
+      ? translateInterface("m1789d2238e4e", { count: data.number_of_seasons })
       : null;
     const genres = (data.genres || []).slice(0, 3).map((g) => g.name);
     const overview = data.overview ? data.overview.slice(0, 120) + (data.overview.length > 120 ? "..." : "") : null;
@@ -92,9 +97,9 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
     let statusText = "";
     if (action === "status-change" && status) {
       const statusLabels: Record<string, string> = {
-        "want-to-watch": "Want to Watch",
+        "want-to-watch": translateInterface("m02e740aaf70d"),
         watching: "Watching",
-        watched: "Watched",
+        watched: "m1ca8c1c0de6f",
         dropped: "Dropped",
       };
       statusText = statusLabels[status] || status;
@@ -123,7 +128,7 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
             <div className="flex items-center gap-1.5 mb-1">
               <ActionIcon className={`h-3.5 w-3.5 ${actionInfo.color}`} />
               <span className={`text-[11px] font-medium ${actionInfo.color}`}>
-                {actionInfo.label}
+                {translateInterface(actionInfo.labelKey)}
                 {statusText && ` → ${statusText}`}
               </span>
             </div>
@@ -153,7 +158,7 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
               {mediaType === "tv" ? (
                 <span className="inline-flex items-center gap-0.5">
                   <Tv className="h-3 w-3" />
-                  {seasonInfo || "TV"}
+                  {seasonInfo || translateInterface("mca62d5e073f5")}
                 </span>
               ) : (
                 runtime && (
@@ -171,7 +176,7 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
               )}
               {rating && (
                 <span className="inline-flex items-center gap-0.5 text-purple-500">
-                  Your rating: {rating}/10
+                  {translateInterface("m30b17903f713")}{" "}{rating}/10
                 </span>
               )}
             </div>
@@ -201,7 +206,7 @@ export default async function TimelineMoviePage({ searchParams }: PageProps) {
       </div>
     );
   } catch (err) {
-    return <ErrorCard message={`Failed to load: ${err instanceof Error ? err.message : "Unknown"}`} />;
+    return <ErrorCard message={translateInterface("m5232c0639543")} />;
   }
 }
 

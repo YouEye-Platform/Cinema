@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Plus, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,8 @@ interface WatchlistSelectorProps {
 }
 
 export function WatchlistSelector({ tmdbId, mediaType, title }: WatchlistSelectorProps) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [open, setOpen] = useState(false);
   const [watchlists, setWatchlists] = useState<readonly Watchlist[]>([]);
   const [added, setAdded] = useState<Set<string>>(new Set());
@@ -55,18 +59,17 @@ export function WatchlistSelector({ tmdbId, mediaType, title }: WatchlistSelecto
         className="gap-2"
       >
         <Plus className="h-4 w-4" />
-        Add to Watchlist
-      </Button>
+        {translateInterface("m2bae6c86af29")}</Button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onMouseDown={() => setOpen(false)} />
           <div className="absolute left-0 top-full mt-2 w-56 bg-popover border rounded-lg shadow-lg z-50 p-2">
             <p className="text-xs text-muted-foreground px-2 py-1 mb-1 truncate">
-              Adding: {title}
+              {translateInterface("mb61ce91ffb65")}{" "}{title}
             </p>
             {watchlists.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-2">No watchlists</p>
+              <p className="text-sm text-muted-foreground text-center py-2">{translateInterface("m2883221765c2")}</p>
             ) : (
               watchlists.map((wl) => (
                 <button

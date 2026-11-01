@@ -20,6 +20,7 @@ export function PersonCard({ id, name, profilePath, character, department }: Per
       <div className="relative overflow-hidden rounded-lg bg-muted aspect-[2/3] mb-2">
         {profilePath && !imgError ? (
           <Image
+            unoptimized
             src={`/api/tmdb/image/t/p/w185${profilePath}`}
             alt={name}
             fill

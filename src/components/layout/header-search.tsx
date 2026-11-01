@@ -1,5 +1,8 @@
 "use client";
+import {useLocale} from "next-intl";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Search, Loader2, Film, Tv, User } from "lucide-react";
 import Image from "next/image";
@@ -18,6 +21,8 @@ interface SearchResult {
 }
 
 export function HeaderSearch() {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [value, setValue] = useState("");
   const [results, setResults] = useState<readonly SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -88,7 +93,8 @@ export function HeaderSearch() {
           onChange={handleChange}
           onFocus={() => results.length > 0 && setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search movies, TV shows, people..."
+          aria-label={translateInterface("maf93de3a7184")}
+          placeholder={translateInterface("maf93de3a7184")}
           className="w-full pl-9 pr-10 py-1.5 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
         />
         {loading && (
@@ -100,7 +106,7 @@ export function HeaderSearch() {
       {open && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-xl shadow-xl max-h-[70vh] overflow-y-auto z-[100]">
           {movies.length > 0 && (
-            <ResultSection icon={<Film className="h-3.5 w-3.5" />} label="Movies">
+            <ResultSection icon={<Film className="h-3.5 w-3.5" />} label={translateInterface("mdff924b69f96")}>
               {movies.slice(0, 5).map((item) => (
                 <ResultItem
                   key={item.id}
@@ -116,7 +122,7 @@ export function HeaderSearch() {
           )}
 
           {tv.length > 0 && (
-            <ResultSection icon={<Tv className="h-3.5 w-3.5" />} label="TV Shows">
+            <ResultSection icon={<Tv className="h-3.5 w-3.5" />} label={translateInterface("m6adcc6960b86")}>
               {tv.slice(0, 5).map((item) => (
                 <ResultItem
                   key={item.id}
@@ -132,7 +138,7 @@ export function HeaderSearch() {
           )}
 
           {people.length > 0 && (
-            <ResultSection icon={<User className="h-3.5 w-3.5" />} label="People">
+            <ResultSection icon={<User className="h-3.5 w-3.5" />} label={translateInterface("m7db20897053b")}>
               {people.slice(0, 5).map((item) => (
                 <ResultItem
                   key={item.id}
@@ -152,8 +158,7 @@ export function HeaderSearch() {
               className="block text-center text-sm text-muted-foreground hover:text-foreground py-2.5 border-t border-border transition-colors"
               onClick={() => { setOpen(false); }}
             >
-              View all results
-            </a>
+              {translateInterface("m117a7e8ecce4")}</a>
           )}
         </div>
       )}
@@ -188,6 +193,7 @@ function ResultItem({
   rating?: number;
   onClick: () => void;
 }) {
+  const locale = useLocale();
   return (
     <a
       href={href}
@@ -196,7 +202,7 @@ function ResultItem({
     >
       {imagePath ? (
         <div className="relative w-8 h-12 rounded overflow-hidden flex-shrink-0 bg-muted">
-          <Image src={imagePath} alt={title} fill className="object-cover" sizes="32px" />
+          <Image unoptimized src={imagePath} alt={title} fill className="object-cover" sizes="32px" />
         </div>
       ) : (
         <div className="w-8 h-12 rounded bg-muted flex items-center justify-center flex-shrink-0">
@@ -207,7 +213,7 @@ function ResultItem({
         <p className="text-sm font-medium truncate">{title}</p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {subtitle && <span>{subtitle}</span>}
-          {rating != null && rating > 0 && <span>★ {rating.toFixed(1)}</span>}
+          {rating != null && rating > 0 && <span>★ {rating.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>}
         </div>
       </div>
     </a>

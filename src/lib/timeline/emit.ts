@@ -1,3 +1,4 @@
+import { getActivityTranslator } from "@/i18n/activity";
 /**
  * Cinema Timeline Event Emitters
  *
@@ -8,6 +9,7 @@
  *   - tags: machine-readable metadata for filtering/MCP/AI
  *
  * Debounced per userId+key to prevent duplicate entries.
+ * Capture time before locale lookup; callers may supply an earlier action time.
  */
 
 import { createApiClient } from "@/lib/api";
@@ -47,15 +49,18 @@ export async function emitMovieViewed(
   overview: string,
   posterPath: string | null,
   year: string,
-  voteAverage: number | null
+  voteAverage: number | null,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   const posterUrl = getImageUrl(posterPath, "w342");
   const tmdbUrl = `https://www.themoviedb.org/${mediaType}/${tmdbId}`;
 
   await emitIfNotDebounced(userId, `viewed:${mediaType}:${tmdbId}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: `cinema-${mediaType}-viewed`,
-    title: `Viewed: ${title}`,
+    title: t("m1e8d52f94988", {title}),
     embed_path: `/embed/timeline/movie?id=${tmdbId}&type=${mediaType}&action=viewed`,
     tags: { tmdb_id: String(tmdbId), media_type: mediaType },
     data: {
@@ -81,15 +86,18 @@ export async function emitMovieWatched(
   posterPath: string | null,
   rating: number | null,
   year: string,
-  voteAverage: number | null
+  voteAverage: number | null,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   const posterUrl = getImageUrl(posterPath, "w342");
   const tmdbUrl = `https://www.themoviedb.org/${mediaType}/${tmdbId}`;
 
   await emitIfNotDebounced(userId, `watched:${mediaType}:${tmdbId}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: `cinema-${mediaType}-watched`,
-    title: `Watched: ${title}`,
+    title: t("m3be7ba22bc33", {title}),
     embed_path: `/embed/timeline/movie?id=${tmdbId}&type=${mediaType}&action=watched` +
       (rating ? `&rating=${rating}` : ""),
     tags: {
@@ -118,19 +126,22 @@ export async function emitAddedToWatchlist(
   mediaType: string,
   title: string,
   posterPath: string | null,
-  year: string
+  year: string,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   const posterUrl = getImageUrl(posterPath, "w342");
   const tmdbUrl = `https://www.themoviedb.org/${mediaType}/${tmdbId}`;
 
   await emitIfNotDebounced(userId, `added:${mediaType}:${tmdbId}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: "cinema-watchlist-add",
-    title: `Added to watchlist: ${title}`,
+    title: t("m1396f921960f", {title}),
     embed_path: `/embed/timeline/movie?id=${tmdbId}&type=${mediaType}&action=watchlist-add`,
     tags: { tmdb_id: String(tmdbId), media_type: mediaType },
     data: {
-      description: `Added ${title} (${year}) to watchlist`,
+      description: t("m0f906198599d", {title, year}),
       thumbnail_url: posterUrl,
       url: tmdbUrl,
       tmdb_id: tmdbId,
@@ -149,26 +160,29 @@ export async function emitStatusChange(
   title: string,
   status: string,
   posterPath: string | null,
-  year: string
+  year: string,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   const posterUrl = getImageUrl(posterPath, "w342");
   const tmdbUrl = `https://www.themoviedb.org/${mediaType}/${tmdbId}`;
   const statusLabels: Record<string, string> = {
-    "want-to-watch": "Want to Watch",
-    watching: "Watching",
-    watched: "Watched",
-    dropped: "Dropped",
+    "want-to-watch": t("m02e740aaf70d"),
+    watching: t("mfbc594054d51"),
+    watched: t("m1ca8c1c0de6f"),
+    dropped: t("m739f68fe97ad"),
   };
   const statusLabel = statusLabels[status] || status;
 
   await emitIfNotDebounced(userId, `status:${mediaType}:${tmdbId}:${status}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: "cinema-status-change",
     title: `${statusLabel}: ${title}`,
     embed_path: `/embed/timeline/movie?id=${tmdbId}&type=${mediaType}&action=status-change&status=${status}`,
     tags: { tmdb_id: String(tmdbId), media_type: mediaType, status },
     data: {
-      description: `Marked ${title} as "${statusLabel}"`,
+      description: t("mc3f102e7c4f1", {title, status: statusLabel}),
       thumbnail_url: posterUrl,
       url: tmdbUrl,
       tmdb_id: tmdbId,
@@ -189,15 +203,18 @@ export async function emitReviewPosted(
   reviewText: string,
   posterPath: string | null,
   rating: number | null,
-  year: string
+  year: string,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   const posterUrl = getImageUrl(posterPath, "w342");
   const tmdbUrl = `https://www.themoviedb.org/${mediaType}/${tmdbId}`;
 
   await emitIfNotDebounced(userId, `review:${mediaType}:${tmdbId}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: "cinema-review",
-    title: `Reviewed: ${title}`,
+    title: t("m4f7b496884c6", {title}),
     embed_path: `/embed/timeline/movie?id=${tmdbId}&type=${mediaType}&action=review` +
       (rating ? `&rating=${rating}` : ""),
     tags: {
@@ -223,16 +240,19 @@ export async function emitReviewPosted(
 export async function emitCinemaSearch(
   userId: string,
   query: string,
-  resultCount: number
+  resultCount: number,
+  timestamp: string = new Date().toISOString()
 ): Promise<void> {
+  const { t } = await getActivityTranslator(userId);
   await emitIfNotDebounced(userId, `search:${query}`, "history", {
+    timestamp,
     app_id: "cinema",
     entry_type: "cinema-search",
-    title: `Searched Cinema: "${query}"`,
+    title: t("md35ed4d4c5f3", {query}),
     embed_path: `/embed/timeline/search?q=${encodeURIComponent(query)}`,
     tags: { result_count: String(resultCount) },
     data: {
-      description: `${resultCount} result${resultCount !== 1 ? "s" : ""} found`,
+      description: t("m1f6c1117aefc", {count: resultCount}),
       query,
       result_count: resultCount,
     },

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { Suspense, useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -31,6 +33,8 @@ export default function SearchPage() {
 }
 
 function SearchPageInner() {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
@@ -70,18 +74,18 @@ function SearchPageInner() {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6">
-      <h1 className="text-2xl font-bold mb-6">Search</h1>
+      <h1 className="text-2xl font-bold mb-6">{translateInterface("m49c266baaaa7")}</h1>
 
       <SearchInput
         onSearch={handleSearch}
         loading={loading}
-        placeholder="Search movies, TV shows, people..."
+        placeholder={translateInterface("maf93de3a7184")}
         className="max-w-xl mb-6"
         initialValue={initialQuery}
       />
 
       {query && !loading && results.length === 0 && (
-        <p className="text-muted-foreground text-center py-12">No results found for &ldquo;{query}&rdquo;</p>
+        <p className="text-muted-foreground text-center py-12">{translateInterface("m0dc5ead892b0", { query })}</p>
       )}
 
       {loading && (
@@ -93,14 +97,14 @@ function SearchPageInner() {
       {results.length > 0 && (
         <Tabs defaultValue="movies">
           <TabsList className="mb-6">
-            <TabsTrigger value="movies">Movies ({movies.length})</TabsTrigger>
-            <TabsTrigger value="tv">TV Shows ({tv.length})</TabsTrigger>
-            <TabsTrigger value="people">People ({people.length})</TabsTrigger>
+            <TabsTrigger value="movies">{translateInterface("m37014f869de3", { count: movies.length })}</TabsTrigger>
+            <TabsTrigger value="tv">{translateInterface("m3d8e078f7981", { count: tv.length })}</TabsTrigger>
+            <TabsTrigger value="people">{translateInterface("me7e631284891", { count: people.length })}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="movies">
             {movies.length === 0 ? (
-              <p className="text-muted-foreground">No movies found</p>
+              <p className="text-muted-foreground">{translateInterface("mb008557a4fcc")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
                 {movies.map((item) => (
@@ -120,7 +124,7 @@ function SearchPageInner() {
 
           <TabsContent value="tv">
             {tv.length === 0 ? (
-              <p className="text-muted-foreground">No TV shows found</p>
+              <p className="text-muted-foreground">{translateInterface("mc0d57a996f56")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
                 {tv.map((item) => (
@@ -140,7 +144,7 @@ function SearchPageInner() {
 
           <TabsContent value="people">
             {people.length === 0 ? (
-              <p className="text-muted-foreground">No people found</p>
+              <p className="text-muted-foreground">{translateInterface("mea574034aa5a")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
                 {people.map((person) => (

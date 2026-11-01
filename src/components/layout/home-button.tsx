@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,6 +9,8 @@ interface HomeButtonProps {
 }
 
 export function HomeButton({ uiBaseUrl }: HomeButtonProps) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   // Derive homepage URL from uiBaseUrl or from current hostname
   // (strip the app subdomain to get the base domain)
   let href = uiBaseUrl;
@@ -28,7 +31,7 @@ export function HomeButton({ uiBaseUrl }: HomeButtonProps) {
       className="h-9 w-9"
       asChild
     >
-      <a href={href} title="Home">
+      <a href={href} title={translateInterface("m3a78695388b3")}>
         <Home className="h-4 w-4" />
       </a>
     </Button>

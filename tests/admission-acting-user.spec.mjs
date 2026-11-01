@@ -18,6 +18,7 @@ function load(path, mocks = {}, extras = {}) {
   const exports = {};
   vm.runInNewContext(code, { exports, require: (name) => {
     if (name === 'next/server') return next;
+    if (name === 'next-intl/server') return { getLocale: async () => 'en', getTranslations: async () => (key, values = {}) => key + JSON.stringify(values) };
     if (name in mocks) return mocks[name];
     throw new Error(`Unexpected dependency: ${name}`);
   }, URL, URLSearchParams, Request, Response, Headers, TextEncoder, AbortSignal, ...extras });

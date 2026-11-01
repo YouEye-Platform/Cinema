@@ -1,11 +1,16 @@
 "use client";
 
+
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Loader2, Save, Key, Eye, EyeOff, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
 
   const [region, setRegion] = useState("US");
   const [includeAdult, setIncludeAdult] = useState(false);
@@ -60,7 +65,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
       });
       const data = await res.json();
       if (!res.ok) {
-        setKeyError(data.error || "Failed to save API key");
+        setKeyError(translateInterface("me2446d6606fb"));
       } else {
         setKeySaved(true);
         setApiKeyInput("");
@@ -70,7 +75,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
         setTimeout(() => setKeySaved(false), 3000);
       }
     } catch {
-      setKeyError("Network error — could not save API key");
+      setKeyError(translateInterface("m9f879fb99e2a"));
     } finally {
       setSavingKey(false);
     }
@@ -88,17 +93,17 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
 
   return (
     <div className={embedded ? "p-4" : "mx-auto max-w-lg px-4 py-6"}>
-      {!embedded && <h1 className="mb-6 text-2xl font-bold">Cinema Settings</h1>}
+      {!embedded && <h1 className="mb-6 text-2xl font-bold">{translateInterface("m1192ea7d6f4d")}</h1>}
 
       <div className="space-y-6">
         {/* TMDB API Key */}
         <div className="rounded-lg border border-border/40 p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Key className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold">TMDB API Key</h2>
+            <h2 className="text-sm font-semibold">{translateInterface("meb5a235a7837")}</h2>
           </div>
           <p className="text-xs text-muted-foreground">
-            Cinema uses TMDB for movie and TV data. Get a free API key at{" "}
+            {translateInterface("mf0a3bce2a488")}{" "}
             <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" className="text-primary underline">
               themoviedb.org/settings/api
             </a>
@@ -110,7 +115,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
                 <Check className="h-4 w-4 text-green-500" />
                 <span className="text-sm font-mono">{apiKeyStatus.masked}</span>
                 <span className="text-xs text-muted-foreground">
-                  ({apiKeyStatus.source === "settings" ? "saved in settings" : "from environment"})
+                  ({apiKeyStatus.source === "settings" ? translateInterface("m30a3f7d4dc3f") : translateInterface("mb5a4a4be1916")})
                 </span>
               </div>
               {apiKeyStatus.source === "settings" && (
@@ -119,8 +124,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
                   disabled={savingKey}
                   className="text-xs text-destructive hover:underline"
                 >
-                  Remove
-                </button>
+                  {translateInterface("mc3812fc4acb8")}</button>
               )}
             </div>
           )}
@@ -131,7 +135,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
                 type={showApiKey ? "text" : "password"}
                 value={apiKeyInput}
                 onChange={(e) => { setApiKeyInput(e.target.value); setKeyError(null); }}
-                placeholder={apiKeyStatus.configured ? "Enter new key to replace" : "Enter your TMDB API key"}
+                placeholder={apiKeyStatus.configured ? translateInterface("mf5f4aae55d8d") : translateInterface("m8b5b6c7a9a21")}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono pr-9"
               />
               <button
@@ -149,8 +153,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
               className="gap-1 shrink-0"
             >
               {savingKey ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-              Save
-            </Button>
+              {translateInterface("m1509f561f241")}</Button>
           </div>
 
           {keyError && (
@@ -162,35 +165,34 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
           {keySaved && (
             <div className="flex items-center gap-1.5 text-xs text-green-500">
               <Check className="h-3.5 w-3.5" />
-              API key saved and verified
-            </div>
+              {translateInterface("me161f349b8fb")}</div>
           )}
         </div>
 
         {/* TMDB Region */}
         <div>
-          <label className="text-sm font-medium block mb-1">TMDB Region</label>
+          <label className="text-sm font-medium block mb-1">{translateInterface("md033fe3dbc88")}</label>
           <Select value={region} onValueChange={setRegion}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="US">United States</SelectItem>
-              <SelectItem value="GB">United Kingdom</SelectItem>
-              <SelectItem value="DE">Germany</SelectItem>
-              <SelectItem value="FR">France</SelectItem>
-              <SelectItem value="ES">Spain</SelectItem>
-              <SelectItem value="RU">Russia</SelectItem>
+              <SelectItem value="US">{translateInterface("m49dca65f362f")}</SelectItem>
+              <SelectItem value="GB">{translateInterface("m8d23a6e37e0a")}</SelectItem>
+              <SelectItem value="DE">{translateInterface("m80db4ccdca10")}</SelectItem>
+              <SelectItem value="FR">{translateInterface("m7a1ca4ef7515")}</SelectItem>
+              <SelectItem value="ES">{translateInterface("m8ef41e6f4b07")}</SelectItem>
+              <SelectItem value="RU">{translateInterface("m33a3d8ed92b0")}</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground mt-1">Affects release dates and availability</p>
+          <p className="text-xs text-muted-foreground mt-1">{translateInterface("mb592152d3476")}</p>
         </div>
 
         {/* Include Adult */}
         <div className="flex items-center justify-between py-3 border-b border-border/40">
           <div>
-            <p className="text-sm font-medium">Include Adult Content</p>
-            <p className="text-xs text-muted-foreground">Show adult-rated content in search and discover</p>
+            <p className="text-sm font-medium">{translateInterface("m6742806a207b")}</p>
+            <p className="text-xs text-muted-foreground">{translateInterface("m5d7c3766b83a")}</p>
           </div>
           <button
             onClick={() => setIncludeAdult(!includeAdult)}
@@ -202,7 +204,7 @@ export function CinemaSettingsPanel({ embedded = false }: { embedded?: boolean }
 
         <Button onClick={handleSave} disabled={saving} className="gap-2 w-full">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {saved ? "Saved!" : "Save Settings"}
+          {saved ? translateInterface("med9b760289e6") : translateInterface("mec92e1dc9bb3")}
         </Button>
       </div>
     </div>

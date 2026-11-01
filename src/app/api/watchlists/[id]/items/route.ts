@@ -32,6 +32,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timestamp = new Date().toISOString();
   const session = await getSession("ye-cinema");
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   await runMigrations();
@@ -64,7 +65,7 @@ export async function POST(
     const title = (tmdbData.title || tmdbData.name || String(tmdb_id)) as string;
     const posterPath = (tmdbData.poster_path || null) as string | null;
     const year = ((tmdbData.release_date || tmdbData.first_air_date || "") as string).slice(0, 4);
-    await emitAddedToWatchlist(session.userId, tmdb_id, media_type, title, posterPath, year);
+    await emitAddedToWatchlist(session.userId, tmdb_id, media_type, title, posterPath, year, timestamp);
   } catch {
     // Non-critical
   }

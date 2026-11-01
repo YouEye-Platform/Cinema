@@ -1,5 +1,9 @@
 "use client";
+import {useLocale as useFormatLocale} from "next-intl";
 
+
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { Star, ExternalLink, Loader2, ChevronDown, ChevronRight } from "lucide-react";
@@ -43,6 +47,10 @@ interface TMDBShow {
 }
 
 export default function TVDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const formatLocale = useFormatLocale();
+
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { id } = use(params);
   const [show, setShow] = useState<TMDBShow | null>(null);
   const [userItem, setUserItem] = useState<{ status?: string; user_rating?: number | null; review_text?: string } | null>(null);
@@ -66,11 +74,11 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
   }
 
   if (!show) {
-    return <div className="p-6 text-center text-muted-foreground">Show not found</div>;
+    return <div className="p-6 text-center text-muted-foreground">{translateInterface("m56cfd30feeba")}</div>;
   }
 
   const year = show.first_air_date?.slice(0, 4) || "";
-  const episodeRuntime = show.episode_run_time?.[0] ? `${show.episode_run_time[0]}m/ep` : null;
+  const episodeRuntime = show.episode_run_time?.[0] ? translateInterface("m27366cda8794", {minutes: show.episode_run_time[0]}) : null;
 
   const handleStatusChange = async (status: string) => {
     await fetch(`/api/items/${id}`, {
@@ -86,7 +94,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
       {/* Backdrop — full-width */}
       {show.backdrop_path && (
         <div className="relative w-full h-72 md:h-96 overflow-hidden">
-          <Image src={`/api/tmdb/image/t/p/w1280${show.backdrop_path}`} alt={show.name} fill className="object-cover" priority sizes="100vw" />
+          <Image unoptimized src={`/api/tmdb/image/t/p/w1280${show.backdrop_path}`} alt={show.name} fill className="object-cover" priority sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
@@ -96,7 +104,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
         <div className="flex flex-col md:flex-row gap-6 mb-8">
           {show.poster_path && (
             <div className="relative w-44 aspect-[2/3] rounded-xl overflow-hidden shadow-xl flex-shrink-0">
-              <Image src={`/api/tmdb/image/t/p/w500${show.poster_path}`} alt={show.name} fill className="object-cover" sizes="176px" />
+              <Image unoptimized src={`/api/tmdb/image/t/p/w500${show.poster_path}`} alt={show.name} fill className="object-cover" sizes="176px" />
             </div>
           )}
 
@@ -110,11 +118,11 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
               {show.vote_average > 0 && (
                 <span className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                  {show.vote_average.toFixed(1)}
+                  {new Intl.NumberFormat(formatLocale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(show.vote_average)}
                 </span>
               )}
-              <span>{show.number_of_seasons} seasons</span>
-              <span>{show.number_of_episodes} episodes</span>
+              <span>{translateInterface("m1789d2238e4e", { count: show.number_of_seasons ?? 0 })}</span>
+              <span>{translateInterface("m8870229e7e13", { count: show.number_of_episodes ?? 0 })}</span>
               <span className={show.status === "Ended" || show.status === "Canceled" ? "text-red-400" : "text-green-400"}>{show.status}</span>
             </div>
 
@@ -128,7 +136,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
 
             {show.created_by.length > 0 && (
               <div className="text-sm mb-4">
-                <span className="text-muted-foreground">Created by: </span>
+                <span className="text-muted-foreground">{translateInterface("m40b476225edf")}{" "}</span>
                 {show.created_by.map((c, i) => (
                   <span key={c.id}>
                     {i > 0 && ", "}
@@ -142,13 +150,13 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
               <WatchlistSelector tmdbId={show.id} mediaType="tv" title={show.name} />
               <Select value={userItem?.status || ""} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-44 h-9">
-                  <SelectValue placeholder="Set Status" />
+                  <SelectValue placeholder={translateInterface("m981d4cec8228")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="want_to_watch">Want to Watch</SelectItem>
-                  <SelectItem value="watching">Watching</SelectItem>
-                  <SelectItem value="watched">Watched</SelectItem>
-                  <SelectItem value="dropped">Dropped</SelectItem>
+                  <SelectItem value="want_to_watch">{translateInterface("m02e740aaf70d")}</SelectItem>
+                  <SelectItem value="watching">{translateInterface("mfbc594054d51")}</SelectItem>
+                  <SelectItem value="watched">{translateInterface("m1ca8c1c0de6f")}</SelectItem>
+                  <SelectItem value="dropped">{translateInterface("m739f68fe97ad")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -169,14 +177,14 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
 
         {/* Review */}
         <div className="mb-8 p-4 bg-muted/30 rounded-xl">
-          <h2 className="text-lg font-semibold mb-3">Your Review</h2>
+          <h2 className="text-lg font-semibold mb-3">{translateInterface("m113fcf1cbe69")}</h2>
           <ReviewEditor tmdbId={show.id} mediaType="tv" initialRating={userItem?.user_rating} initialReview={userItem?.review_text} />
         </div>
 
         {/* Seasons */}
         {show.seasons.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Seasons</h2>
+            <h2 className="text-xl font-semibold mb-4">{translateInterface("mc15527b19b99")}</h2>
             <div className="space-y-2">
               {show.seasons.filter(s => s.season_number > 0).map((season) => (
                 <div key={season.id} className="border rounded-xl overflow-hidden">
@@ -186,13 +194,13 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
                   >
                     {season.poster_path && (
                       <div className="relative w-12 aspect-[2/3] rounded overflow-hidden flex-shrink-0">
-                        <Image src={`/api/tmdb/image/t/p/w92${season.poster_path}`} alt={season.name} fill className="object-cover" sizes="48px" />
+                        <Image unoptimized src={`/api/tmdb/image/t/p/w92${season.poster_path}`} alt={season.name} fill className="object-cover" sizes="48px" />
                       </div>
                     )}
                     <div className="flex-1 text-left min-w-0">
                       <p className="font-medium">{season.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {season.episode_count} episodes
+                        {translateInterface("m8870229e7e13", { count: season.episode_count ?? 0 })}
                         {season.air_date && ` • ${season.air_date.slice(0, 4)}`}
                       </p>
                     </div>
@@ -208,8 +216,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
                         href={`/tv/${id}/season/${season.season_number}`}
                         className="text-sm text-primary hover:underline"
                       >
-                        View all episodes →
-                      </a>
+                        {translateInterface("m67b2e9ba8369")}</a>
                     </div>
                   )}
                 </div>
@@ -221,7 +228,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
         {/* Cast */}
         {(show.credits?.cast?.length ?? 0) > 0 && (
           <div className="mb-8">
-            <Carousel title="Cast">
+            <Carousel title={translateInterface("m150040557337")}>
               {show.credits!.cast.slice(0, 20).map((person) => (
                 <PersonCard key={person.id} id={person.id} name={person.name} profilePath={person.profile_path} character={person.character} />
               ))}
@@ -230,7 +237,7 @@ export default function TVDetailPage({ params }: { params: Promise<{ id: string 
         )}
 
         {(show.similar?.results?.length ?? 0) > 0 && (
-          <Carousel title="Similar Shows">
+          <Carousel title={translateInterface("m24c001aa604f")}>
             {show.similar!.results.slice(0, 20).map((item) => (
               <MovieCard key={item.id} id={item.id} mediaType="tv" title={item.name || item.title || ""} posterPath={item.poster_path} year={(item.first_air_date || "").slice(0, 4)} rating={item.vote_average} />
             ))}

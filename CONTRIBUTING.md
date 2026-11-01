@@ -28,3 +28,32 @@ existing branch/merge workflow remains in effect.
 This product retains its own version sequence; it is not numbered from the
 YouEye core release group. Keep every registered source version authority
 consistent. Unchanged published payloads retain their original provenance.
+
+## Artifact promotion
+
+`.youeye/release/artifact-promotion.json` opts this source into external signed
+product release metadata. Source/package versions remain immutable build identity.
+The platform signs `product-build.json` once, binding the original source commit,
+artifact hashes and install contract; `product-release.json` assigns independent
+product versions and channels to that unchanged signed build. Promotion does not
+run source version preparation, repackage archives or repeat unchanged builds.
+Legacy releases keep their existing contract. New source/dependency/toolchain or
+build-configuration changes require a new candidate and relevant validation.
+
+Runtime consumers read the platform's accepted protected release projection
+outside their code directory. Missing or invalid metadata reports an unknown
+release while preserving the original build version for diagnostics. A metadata
+label alone never establishes payload integrity, schema readiness or acceptance.
+
+## Timeline producers
+
+Use the existing API helper for Timeline activity and follow
+[the collection contract](docs/timeline-collection.md). Never bypass fresh consent
+or queue/replay Timeline payloads after a rejected event.
+
+## Interface languages
+
+Follow [the localization contract](docs/localization.md) for interface work.
+New text needs messages in every registered language, including error and
+accessible labels. Run `pnpm i18n:check`; do not expand the existing-literal
+baseline to admit untranslated features.

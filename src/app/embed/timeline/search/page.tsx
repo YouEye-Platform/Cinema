@@ -1,3 +1,4 @@
+import { getLocale, getTranslations as getInterfaceTranslations } from "next-intl/server";
 /**
  * Cinema Timeline Embed — Search Card
  *
@@ -28,11 +29,14 @@ interface SearchResult {
 }
 
 export default async function TimelineSearchPage({ searchParams }: PageProps) {
+  const locale = await getLocale();
+  const translateInterface = await getInterfaceTranslations("interface");
+
   const params = await searchParams;
   const { q } = params;
 
   if (!q) {
-    return <ErrorCard message="No query provided" />;
+    return <ErrorCard message={translateInterface("m548b19d0dae6")} />;
   }
 
   await runMigrations();
@@ -53,10 +57,9 @@ export default async function TimelineSearchPage({ searchParams }: PageProps) {
         <div className="flex items-center gap-1.5 mb-2">
           <Search className="h-3.5 w-3.5 text-amber-500" />
           <span className="text-[11px] font-medium text-amber-500">
-            Searched Cinema
-          </span>
+            {translateInterface("mcb0e5a0a543d")}</span>
           <span className="text-[11px] text-muted-foreground">
-            · {totalResults} result{totalResults !== 1 ? "s" : ""}
+            · {translateInterface("m9a719be343e8", { count: totalResults })}
           </span>
         </div>
 
@@ -69,10 +72,10 @@ export default async function TimelineSearchPage({ searchParams }: PageProps) {
         {results.length > 0 && (
           <div className="space-y-1.5">
             {results.map((r) => {
-              const title = r.title || r.name || "Unknown";
+              const title = r.title || r.name || translateInterface("mb764cdc0eab7");
               const year = (r.release_date || r.first_air_date || "").slice(0, 4);
               const poster = getImageUrl(r.poster_path || null, "w92");
-              const rating = r.vote_average ? r.vote_average.toFixed(1) : null;
+              const rating = r.vote_average ? r.vote_average.toLocaleString(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1}) : null;
               const url = cinemaBaseUrl
                 ? `${cinemaBaseUrl}/${r.media_type}/${r.id}`
                 : null;
@@ -123,7 +126,7 @@ export default async function TimelineSearchPage({ searchParams }: PageProps) {
       </div>
     );
   } catch (err) {
-    return <ErrorCard message={`Search failed: ${err instanceof Error ? err.message : "Unknown"}`} />;
+    return <ErrorCard message={translateInterface("m5232c0639543")} />;
   }
 }
 

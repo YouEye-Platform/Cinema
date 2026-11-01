@@ -8,6 +8,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
+  const timestamp = new Date().toISOString();
   const session = await getSession("ye-cinema");
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -41,14 +42,14 @@ export async function GET(
       const voteAvg = (data.vote_average || null) as number | null;
 
       // Fire-and-forget — don't block the response
-      emitMovieViewed(session.userId, tmdbId, mediaType, title, overview, posterPath, year, voteAvg).catch(() => {});
+      emitMovieViewed(session.userId, tmdbId, mediaType, title, overview, posterPath, year, voteAvg, timestamp).catch(() => {});
     }
 
     // ── Timeline: emit cinema search query ──
     // Pattern: /search/multi?query=...
     if (tmdbPath === "/search/multi" && queryParams.query) {
       const resultCount = (data.total_results ?? 0) as number;
-      emitCinemaSearch(session.userId, queryParams.query, resultCount).catch(() => {});
+      emitCinemaSearch(session.userId, queryParams.query, resultCount, timestamp).catch(() => {});
     }
 
     return NextResponse.json(data);

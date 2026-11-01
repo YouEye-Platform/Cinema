@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
+
 
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
@@ -19,6 +21,8 @@ interface SharedWatchlist {
 }
 
 export default function SharedWatchlistPage({ params }: { params: Promise<{ token: string }> }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { token } = use(params);
   const [watchlist, setWatchlist] = useState<SharedWatchlist | null>(null);
   const [items, setItems] = useState<readonly SharedItem[]>([]);
@@ -28,7 +32,7 @@ export default function SharedWatchlistPage({ params }: { params: Promise<{ toke
   useEffect(() => {
     fetch(`/api/shared/${token}`)
       .then((r) => {
-        if (!r.ok) throw new Error("Not found");
+        if (!r.ok) throw new Error(translateInterface("me3ebaa16dd9d"));
         return r.json();
       })
       .then((d) => {
@@ -45,8 +49,8 @@ export default function SharedWatchlistPage({ params }: { params: Promise<{ toke
     return (
       <div className="flex flex-col items-center justify-center min-h-96 text-muted-foreground">
         <Lock className="h-12 w-12 mb-3 opacity-50" />
-        <h2 className="text-xl font-semibold mb-2">Watchlist Not Found</h2>
-        <p className="text-sm">This watchlist may have been removed or sharing was disabled.</p>
+        <h2 className="text-xl font-semibold mb-2">{translateInterface("m7823aa046f23")}</h2>
+        <p className="text-sm">{translateInterface("m5c9cc4878ccc")}</p>
       </div>
     );
   }
@@ -58,13 +62,13 @@ export default function SharedWatchlistPage({ params }: { params: Promise<{ toke
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-1">{watchlist.name}</h1>
         {watchlist.description && <p className="text-muted-foreground">{watchlist.description}</p>}
-        <p className="text-sm text-muted-foreground mt-2">{items.length} items</p>
+        <p className="text-sm text-muted-foreground mt-2">{translateInterface("m1eb9964e9518", { count: items.length })}</p>
       </div>
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Film className="h-12 w-12 mb-3 opacity-50" />
-          <p>This watchlist is empty</p>
+          <p>{translateInterface("m76ad9a57b8ad")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -93,7 +97,7 @@ function SharedItemCard({ item }: { item: SharedItem }) {
     <a href={`/${item.media_type}/${item.tmdb_id}`} className="block group">
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted mb-2">
         {tmdb?.poster_path ? (
-          <Image src={`/api/tmdb/image/t/p/w342${tmdb.poster_path}`} alt={title} fill className="object-cover" sizes="200px" />
+          <Image unoptimized src={`/api/tmdb/image/t/p/w342${tmdb.poster_path}`} alt={title} fill className="object-cover" sizes="200px" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs text-center p-2">{title}</div>
         )}

@@ -19,6 +19,7 @@ export async function GET(
   const headers = new Headers();
   const contentType = upstream.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
-  headers.set("cache-control", "public, max-age=86400");
+  // Browser delivery must recheck admission after logout, revocation or account switch.
+  headers.set("cache-control", "private, no-store");
   return new Response(upstream.body, { status: upstream.status, headers });
 }

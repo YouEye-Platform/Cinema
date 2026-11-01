@@ -1,0 +1,12 @@
+{
+  "[\"src/app/embed/card/movie/page.tsx\",\"&ldquo;\"]": 1,
+  "[\"src/app/embed/card/movie/page.tsx\",\"&rdquo;\"]": 1,
+  "[\"src/app/embed/timeline/search/page.tsx\",\"&ldquo;\"]": 1,
+  "[\"src/app/embed/timeline/search/page.tsx\",\"&rdquo;\"]": 1,
+  "[\"src/app/movie/[id]/page.tsx\",\"IMDB\"]": 1,
+  "[\"src/app/movie/[id]/page.tsx\",\"TMDB\"]": 1,
+  "[\"src/app/person/[id]/page.tsx\",\"IMDB\"]": 1,
+  "[\"src/app/person/[id]/page.tsx\",\"TMDB\"]": 1,
+  "[\"src/app/settings/settings-panel.tsx\",\"themoviedb.org/settings/api\"]": 1,
+  "[\"src/app/tv/[id]/page.tsx\",\"TMDB\"]": 1
+}

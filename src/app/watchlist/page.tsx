@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Plus, Loader2, Trash2, Share2, Globe, Film } from "lucide-react";
@@ -30,6 +32,8 @@ interface WatchlistItem {
 type StatusFilter = "all" | "want_to_watch" | "watching" | "watched" | "dropped";
 
 export default function WatchlistPage() {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [watchlists, setWatchlists] = useState<readonly Watchlist[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [items, setItems] = useState<readonly WatchlistItem[]>([]);
@@ -76,7 +80,7 @@ export default function WatchlistPage() {
   };
 
   const deleteWatchlist = async (id: string) => {
-    if (!confirm("Delete this watchlist?")) return;
+    if (!confirm(translateInterface("mdd272dd712e0"))) return;
     await fetch(`/api/watchlists/${id}`, { method: "DELETE" });
     if (selectedId === id) setSelectedId(null);
     await loadWatchlists();
@@ -115,10 +119,9 @@ export default function WatchlistPage() {
   return (
     <div className="max-w-screen-xl mx-auto px-4 md:px-6 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">My Watchlists</h1>
+        <h1 className="text-2xl font-bold">{translateInterface("ma60640a6c866")}</h1>
         <Button size="sm" onClick={() => setShowCreate(true)} className="gap-2">
-          <Plus className="h-4 w-4" />New Watchlist
-        </Button>
+          <Plus className="h-4 w-4" />{translateInterface("m2a06790631b0")}</Button>
       </div>
 
       {showCreate && (
@@ -129,14 +132,14 @@ export default function WatchlistPage() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createWatchlist()}
-              placeholder="Watchlist name..."
+              placeholder={translateInterface("m91d25ce9ee88")}
               className="flex-1 px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring"
               autoFocus
             />
             <Button size="sm" onClick={createWatchlist} disabled={creating || !newName.trim()}>
-              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create"}
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : translateInterface("m4759498ac2a7")}
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)}>Cancel</Button>
+            <Button size="sm" variant="ghost" onClick={() => setShowCreate(false)}>{translateInterface("m19766ed6ccb2")}</Button>
           </div>
         </div>
       )}
@@ -163,7 +166,7 @@ export default function WatchlistPage() {
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => toggleShare(selectedWatchlist.id)} className="gap-2 text-xs">
             <Share2 className="h-3.5 w-3.5" />
-            {selectedWatchlist.is_shared ? "Disable Sharing" : "Enable Sharing"}
+            {selectedWatchlist.is_shared ? translateInterface("m753a7712f2c8") : translateInterface("mafe5ed49a46c")}
           </Button>
           {selectedWatchlist.is_shared && selectedWatchlist.share_token && (
             <Button
@@ -172,17 +175,15 @@ export default function WatchlistPage() {
               className="gap-2 text-xs"
               onClick={() => navigator.clipboard.writeText(`${window.location.origin}/shared/${selectedWatchlist.share_token}`)}
             >
-              Copy Share Link
-            </Button>
+              {translateInterface("m1bba6ac92761")}</Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => togglePublish(selectedWatchlist.id)} className="gap-2 text-xs">
             <Globe className="h-3.5 w-3.5" />
-            {selectedWatchlist.is_published ? "Unpublish" : "Publish"}
+            {selectedWatchlist.is_published ? translateInterface("m2db04a54fa74") : translateInterface("m859390eb495b")}
           </Button>
           {!selectedWatchlist.is_default && (
             <Button variant="ghost" size="sm" onClick={() => deleteWatchlist(selectedWatchlist.id)} className="gap-2 text-xs text-destructive hover:text-destructive">
-              <Trash2 className="h-3.5 w-3.5" />Delete
-            </Button>
+              <Trash2 className="h-3.5 w-3.5" />{translateInterface("me2d0a54968ea")}</Button>
           )}
 
           {/* Status filter */}
@@ -192,11 +193,11 @@ export default function WatchlistPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="want_to_watch">Want to Watch</SelectItem>
-                <SelectItem value="watching">Watching</SelectItem>
-                <SelectItem value="watched">Watched</SelectItem>
-                <SelectItem value="dropped">Dropped</SelectItem>
+                <SelectItem value="all">{translateInterface("m05f567125eb0")}</SelectItem>
+                <SelectItem value="want_to_watch">{translateInterface("m02e740aaf70d")}</SelectItem>
+                <SelectItem value="watching">{translateInterface("mfbc594054d51")}</SelectItem>
+                <SelectItem value="watched">{translateInterface("m1ca8c1c0de6f")}</SelectItem>
+                <SelectItem value="dropped">{translateInterface("m739f68fe97ad")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -208,8 +209,8 @@ export default function WatchlistPage() {
       ) : filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Film className="h-12 w-12 mb-3 opacity-50" />
-          <p>No items in this watchlist</p>
-          <p className="text-sm mt-1">Browse movies and TV shows to add them</p>
+          <p>{translateInterface("m5d6f9ce04939")}</p>
+          <p className="text-sm mt-1">{translateInterface("m84a01654b89f")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -236,6 +237,8 @@ function WatchlistItemCard({
   onStatusChange: (tmdbId: number, mediaType: string, status: string) => void;
   onRemove: (tmdbId: number, mediaType: string) => void;
 }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [tmdbData, setTmdbData] = useState<{ title?: string; name?: string; poster_path?: string | null } | null>(null);
 
   useEffect(() => {
@@ -254,6 +257,7 @@ function WatchlistItemCard({
         <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted mb-2">
           {poster ? (
             <Image
+            unoptimized
               src={`/api/tmdb/image/t/p/w342${poster}`}
               alt={title}
               fill
@@ -281,10 +285,10 @@ function WatchlistItemCard({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="want_to_watch">Want to Watch</SelectItem>
-          <SelectItem value="watching">Watching</SelectItem>
-          <SelectItem value="watched">Watched</SelectItem>
-          <SelectItem value="dropped">Dropped</SelectItem>
+          <SelectItem value="want_to_watch">{translateInterface("m02e740aaf70d")}</SelectItem>
+          <SelectItem value="watching">{translateInterface("mfbc594054d51")}</SelectItem>
+          <SelectItem value="watched">{translateInterface("m1ca8c1c0de6f")}</SelectItem>
+          <SelectItem value="dropped">{translateInterface("m739f68fe97ad")}</SelectItem>
         </SelectContent>
       </Select>
     </div>

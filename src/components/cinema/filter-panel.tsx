@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Genre {
@@ -30,6 +32,8 @@ export function FilterPanel({
   minRating,
   onMinRatingChange,
 }: FilterPanelProps) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   return (
     <div className="flex flex-wrap gap-3 mb-6">
       {/* Media Type */}
@@ -42,8 +46,7 @@ export function FilterPanel({
               : "hover:bg-muted text-muted-foreground"
           }`}
         >
-          Movies
-        </button>
+          {translateInterface("mdff924b69f96")}</button>
         <button
           onClick={() => onMediaTypeChange("tv")}
           className={`px-3 py-1.5 text-sm transition-colors ${
@@ -52,17 +55,16 @@ export function FilterPanel({
               : "hover:bg-muted text-muted-foreground"
           }`}
         >
-          TV Shows
-        </button>
+          {translateInterface("m6adcc6960b86")}</button>
       </div>
 
       {/* Genre */}
       <Select value={selectedGenre} onValueChange={onGenreChange}>
         <SelectTrigger className="w-40 h-9">
-          <SelectValue placeholder="All Genres" />
+          <SelectValue placeholder={translateInterface("m90009547165f")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Genres</SelectItem>
+          <SelectItem value="all">{translateInterface("m90009547165f")}</SelectItem>
           {genres.map((g) => (
             <SelectItem key={g.id} value={String(g.id)}>
               {g.name}
@@ -74,23 +76,23 @@ export function FilterPanel({
       {/* Sort By */}
       <Select value={sortBy} onValueChange={onSortByChange}>
         <SelectTrigger className="w-44 h-9">
-          <SelectValue placeholder="Sort by" />
+          <SelectValue placeholder={translateInterface("mc9129025bd3f")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="popularity.desc">Popularity</SelectItem>
-          <SelectItem value="vote_average.desc">Rating</SelectItem>
-          <SelectItem value="release_date.desc">Release Date</SelectItem>
-          <SelectItem value="revenue.desc">Revenue</SelectItem>
+          <SelectItem value="popularity.desc">{translateInterface("mfe60d8511c44")}</SelectItem>
+          <SelectItem value="vote_average.desc">{translateInterface("m9f29530464f7")}</SelectItem>
+          <SelectItem value="release_date.desc">{translateInterface("m1fb0ecfb5d03")}</SelectItem>
+          <SelectItem value="revenue.desc">{translateInterface("mc4b7330bd91e")}</SelectItem>
         </SelectContent>
       </Select>
 
       {/* Min Rating */}
       <Select value={minRating} onValueChange={onMinRatingChange}>
         <SelectTrigger className="w-36 h-9">
-          <SelectValue placeholder="Min Rating" />
+          <SelectValue placeholder={translateInterface("md3769b07b54d")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="0">Any Rating</SelectItem>
+          <SelectItem value="0">{translateInterface("mbbf585b86efc")}</SelectItem>
           <SelectItem value="5">5+ / 10</SelectItem>
           <SelectItem value="6">6+ / 10</SelectItem>
           <SelectItem value="7">7+ / 10</SelectItem>

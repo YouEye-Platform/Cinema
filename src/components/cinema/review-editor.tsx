@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useTranslations as useInterfaceTranslations } from "next-intl";
 import { useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,8 @@ interface ReviewEditorProps {
 }
 
 export function ReviewEditor({ tmdbId, mediaType, initialRating = null, initialReview = "", onSaved }: ReviewEditorProps) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const [rating, setRating] = useState<number | null>(initialRating);
   const [review, setReview] = useState(initialReview);
   const [saving, setSaving] = useState(false);
@@ -44,16 +48,16 @@ export function ReviewEditor({ tmdbId, mediaType, initialRating = null, initialR
   return (
     <div className="space-y-3">
       <div>
-        <label className="text-sm font-medium mb-1 block">Your Rating</label>
+        <label className="text-sm font-medium mb-1 block">{translateInterface("me02bce4b378f")}</label>
         <RatingStars value={rating} onChange={setRating} />
       </div>
 
       <div>
-        <label className="text-sm font-medium mb-1 block">Review</label>
+        <label className="text-sm font-medium mb-1 block">{translateInterface("maff0766a5290")}</label>
         <textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder="Write your thoughts..."
+          placeholder={translateInterface("mdef1ebe1f1af")}
           rows={4}
           className="w-full px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring resize-none placeholder:text-muted-foreground"
         />
@@ -70,7 +74,7 @@ export function ReviewEditor({ tmdbId, mediaType, initialRating = null, initialR
         ) : (
           <Save className="h-4 w-4" />
         )}
-        {saved ? "Saved!" : "Save Review"}
+        {saved ? translateInterface("med9b760289e6") : translateInterface("m66d3a3ed8cd5")}
       </Button>
     </div>
   );

@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations as useInterfaceTranslations } from "next-intl";
+
 
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
@@ -34,6 +36,8 @@ interface Person {
 }
 
 export default function PersonPage({ params }: { params: Promise<{ id: string }> }) {
+  const translateInterface = useInterfaceTranslations("interface");
+
   const { id } = use(params);
   const [person, setPerson] = useState<Person | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +50,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
   }, [id]);
 
   if (loading) return <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
-  if (!person) return <div className="p-6 text-center text-muted-foreground">Person not found</div>;
+  if (!person) return <div className="p-6 text-center text-muted-foreground">{translateInterface("m0d245daf616d")}</div>;
 
   const sortedCast = [...(person.combined_credits?.cast || [])]
     .sort((a, b) => b.vote_average - a.vote_average)
@@ -58,7 +62,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         <div className="flex-shrink-0">
           <div className="relative w-48 aspect-[2/3] rounded-xl overflow-hidden bg-muted">
             {person.profile_path ? (
-              <Image src={`/api/tmdb/image/t/p/h632${person.profile_path}`} alt={person.name} fill className="object-cover" sizes="192px" />
+              <Image unoptimized src={`/api/tmdb/image/t/p/h632${person.profile_path}`} alt={person.name} fill className="object-cover" sizes="192px" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <User className="h-12 w-12 text-muted-foreground" />
@@ -73,8 +77,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
           {person.birthday && (
             <p className="text-sm text-muted-foreground mb-2">
-              Born: {person.birthday}
-              {person.place_of_birth && ` in ${person.place_of_birth}`}
+              {person.place_of_birth ? translateInterface("me31915ed8e5f", {date: person.birthday, place: person.place_of_birth}) : translateInterface("m87de72da2bd2", {date: person.birthday})}
             </p>
           )}
 
@@ -99,7 +102,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
       {sortedCast.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Known For</h2>
+          <h2 className="text-xl font-semibold mb-4">{translateInterface("m0954e00c2028")}</h2>
           <div className="flex flex-wrap gap-3">
             {sortedCast.map((credit) => (
               <MovieCard

@@ -1,3 +1,4 @@
+import {getLocale, getTranslations as getInterfaceTranslations} from "next-intl/server";
 import { NextResponse } from "next/server";
 import { runMigrations } from "@/lib/db/migrate";
 import { tmdbFetch, getImageUrl } from "@/lib/tmdb/client";
@@ -19,6 +20,8 @@ function extractTMDBId(url: string): { id: string; mediaType: string } | null {
 }
 
 export async function GET(request: Request) {
+  const translateInterface = await getInterfaceTranslations("interface");
+  const locale = await getLocale();
   await runMigrations();
 
   const reqUrl = new URL(request.url);
@@ -54,13 +57,13 @@ export async function GET(request: Request) {
       tmdbData = await tmdbFetch(`/${mediaType}/${extracted.id}`, { append_to_response: "credits" });
     }
 
-    const title = (tmdbData.title || tmdbData.name || "Unknown") as string;
+    const title = (tmdbData.title || tmdbData.name || translateInterface("mb764cdc0eab7")) as string;
     const year = ((tmdbData.release_date || tmdbData.first_air_date || "") as string).slice(0, 4);
     const genres = ((tmdbData.genres as Array<{ name: string }>) || []).map((g) => g.name).join(", ");
     const runtime = tmdbData.runtime
-      ? `${Math.floor(Number(tmdbData.runtime) / 60)}h ${Number(tmdbData.runtime) % 60}m`
+      ? translateInterface("m425dc6c72de6", {hours: Math.floor(Number(tmdbData.runtime) / 60), minutes: Number(tmdbData.runtime) % 60})
       : null;
-    const rating = tmdbData.vote_average ? `${Number(tmdbData.vote_average).toFixed(1)}/10` : null;
+    const rating = tmdbData.vote_average ? `${new Intl.NumberFormat(locale, {minimumFractionDigits: 1, maximumFractionDigits: 1}).format(Number(tmdbData.vote_average))}/10` : null;
     const overview = (tmdbData.overview || "") as string;
     const poster = getImageUrl((tmdbData.poster_path as string | null) || null, "w342");
     const tmdbId = tmdbData.id as number;
@@ -72,10 +75,10 @@ export async function GET(request: Request) {
     const subtitleParts = [year, genres, runtime].filter(Boolean);
 
     const facts = [
-      rating ? { label: "Rating", value: rating } : null,
-      director ? { label: "Director", value: director } : null,
-      cast ? { label: "Cast", value: cast } : null,
-      year ? { label: "Release", value: year } : null,
+      rating ? { label: translateInterface("m9f29530464f7"), value: rating } : null,
+      director ? { label: translateInterface("mc149bc14e45c"), value: director } : null,
+      cast ? { label: translateInterface("m150040557337"), value: cast } : null,
+      year ? { label: translateInterface("me020e3c67bd0"), value: year } : null,
     ].filter(Boolean);
 
     const tmdbUrl = `https://themoviedb.org/${mediaType}/${tmdbId}`;
@@ -90,7 +93,7 @@ export async function GET(request: Request) {
       image: poster,
       facts,
       actions: [
-        { label: "View in Cinema", url: cinemaUrl },
+        { label: translateInterface("m8f7b673ea342"), url: cinemaUrl },
         { label: "TMDB", url: tmdbUrl, external: true },
       ],
       source_url: cinemaUrl,
