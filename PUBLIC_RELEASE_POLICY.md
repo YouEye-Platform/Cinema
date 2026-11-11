@@ -7,8 +7,8 @@ does not remove it from existing history.
 The public project website is informational metadata. The install manifest's
 source repository is preserved from the established release line; changing it
 requires an explicit source/channel migration, not a documentation cleanup.
-Development build entrypoints do not sign, publish, accept credentials, or
-establish Stable trust. A public publication requires a separately reviewed
+Development build entrypoints do not publish, accept credentials, or establish
+Stable trust. A public publication requires a separately reviewed
 source identity and curated baseline.
 
 The build manifest identifies the existing supported `koshka-lxc-625-v1`
@@ -16,11 +16,12 @@ executor. Executor selection is an Alex/Infra boundary: this product neither
 creates executor identities nor makes an infrastructure trust assertion.
 `release-manifest.json` uses the product-local release-metadata format only;
 it is source-bound product metadata, not an Infra manifest or replacement for
-Infra validation, provenance, SBOM, signing, or publication records.
+Infra validation or publication records.
 
 A promotion must bind an exact source commit, source epoch, version, branch,
-tag, artifact digest, SBOM, provenance, and destination. For legacy releases the version inside `standalone.tar` matches the release
+tag, artifact SHA-256 digest, and destination. For legacy releases the version inside `standalone.tar` matches the release
 tag. With the artifact-promotion capability it remains the immutable build
 version; `/api/manifest` reads the accepted external product release version.
-Both the original build and new release signatures must verify independently.
+Releases are unsigned: the original build and the new release metadata are
+each checked by SHA-256 digest.
 Existing tags and assets are immutable.
