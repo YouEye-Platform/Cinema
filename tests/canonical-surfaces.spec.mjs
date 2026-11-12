@@ -19,7 +19,7 @@ test("Cinema publishes canonical surfaces in runtime and install manifests", () 
   const route = read("src/app/api/manifest/route.ts");
   const yaml = read("youeye-app.yaml");
 
-  assert.match(route, /buildVersion: packageJson\.version/);
+  assert.match(route, /version: BUILD_VERSION/);
   assert.match(route, /surfaceSchemaVersion: 1/);
   assert.match(route, /const surfaces\s*=\s*\[/);
   assert.match(route, /\n\s+surfaces,/);

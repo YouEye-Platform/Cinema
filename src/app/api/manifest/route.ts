@@ -1,6 +1,5 @@
-import { installedRelease } from "@/lib/installed-release";
 import { NextResponse } from "next/server";
-import packageJson from "../../../../package.json";
+import { BUILD_VERSION } from "@/lib/build-version";
 
 const surfaces = [
     {
@@ -133,13 +132,10 @@ const surfaces = [
     ];
 
 export async function GET() {
-  const release = await installedRelease("cinema", packageJson.version);
   return NextResponse.json({
     id: "ye-cinema",
     name: "Cinema",
-    version: release?.version ?? "unknown",
-    buildVersion: packageJson.version,
-    release,
+    version: BUILD_VERSION,
     description: "Personal movie & TV discovery with watchlists, ratings, and reviews",
     icon: "Film",
     accent_color: "#a855f7",
