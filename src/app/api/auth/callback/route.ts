@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getOAuthConfig, exchangeCodeForToken, fetchUserInfo } from "@/lib/auth";
 import { createSession } from "@/lib/auth";
+import { isYouEyeAdmin } from "@/lib/auth/admin";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
   if (!userInfo) return NextResponse.redirect(new URL("/api/auth/sso", request.url));
   if (!userInfo.sid) return NextResponse.redirect(new URL("/api/auth/sso", request.url));
 
-  const isAdmin = (userInfo.groups || []).some((g: string) => g.toLowerCase().includes("admin"));
+  const isAdmin = isYouEyeAdmin(userInfo.groups);
   const sessionToken = await createSession({
     userId: userInfo.sub,
     identitySessionId: userInfo.sid,

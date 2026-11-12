@@ -31,9 +31,9 @@ test("Cinema publishes canonical surfaces in runtime and install manifests", () 
   assert.doesNotMatch(route, /\n\s+info_cards:\s*\[/);
 
   assert.match(yaml, versionPattern());
-  assert.match(yaml, /surfaceSchemaVersion: 1/);
+  assert.match(yaml, /^schema: youeye\.app\.v1$/m);
   assert.match(yaml, /- id: now-watching/);
   assert.match(yaml, /kind: settings-panel/);
   assert.match(yaml, /kind: info-card/);
-  assert.match(yaml, /- cinema-search/);
+  assert.match(yaml, /triggers: \[[^\]]*\bcinema-search\b/);
 });
