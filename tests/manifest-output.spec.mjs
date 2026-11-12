@@ -11,14 +11,14 @@ test("runtime manifest exposes each installed surface exactly once with a real e
     .replace(/^import .*;\n/gm, "")
     .replace("export async function GET", "async function GET");
   const manifest = JSON.parse(JSON.stringify(await runInNewContext(`${source}\nGET()`, {
-    BUILD_VERSION: "1.2.3-rc.4",
+    BUILD_VERSION: "1.2.3-dev.4",
     NextResponse: { json: (body) => body },
   })));
   const declared = [...read("youeye-app.yaml").split("\nsurfaces:\n")[1]
     .split(/\n[^ #\n]/)[0].matchAll(/^  - id: (.+)$/gm)].map((match) => match[1]);
   const ids = manifest.surfaces.map((surface) => surface.id);
   assert.equal(manifest.surfaceSchemaVersion, 1);
-  assert.equal(manifest.version,"1.2.3-rc.4");
+  assert.equal(manifest.version,"1.2.3-dev.4");
   assert.equal(new Set(ids).size, ids.length, "duplicate surface IDs");
   assert.deepEqual([...ids].sort(), declared.sort(), "runtime and install surface IDs differ");
   for (const surface of manifest.surfaces) {
