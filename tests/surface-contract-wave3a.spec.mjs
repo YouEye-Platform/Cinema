@@ -45,7 +45,7 @@ test("Cinema declares the Wave 3A surface contract", () => {
 
 });
 
-test("Cinema runtime source no longer emits legacy embed messages", () => {
+test("Cinema runtime source emits no removed embed message types", () => {
   const combined = sourceFiles("src").map((file) => read(file)).join("\n");
   assert.doesNotMatch(combined, /youeye-embed-ready|youeye-embed-resize|youeye-card-ready|youeye-app-settings-resize|contentHeight|settings\?embed=true/);
 });
