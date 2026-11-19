@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { BUILD_VERSION } from "@/lib/build-version";
+import { APP_VERSION } from "@/lib/app-version";
 
 const surfaces = [
     {
@@ -135,7 +135,7 @@ export async function GET() {
   return NextResponse.json({
     id: "ye-cinema",
     name: "Cinema",
-    version: BUILD_VERSION,
+    version: APP_VERSION,
     description: "Personal movie & TV discovery with watchlists, ratings, and reviews",
     icon: "Film",
     accent_color: "#a855f7",
